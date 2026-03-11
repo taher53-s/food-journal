@@ -1,0 +1,67 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: "Cormorant Garamond", Georgia, serif;
+  --font-jakarta: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+  body { background-color: #FAF7F0; color: #0D0D0B; font-family: var(--font-jakarta); min-height: 100vh; }
+  ::selection { background: rgba(27,94,67,0.2); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #FAF7F0; }
+  ::-webkit-scrollbar-thumb { background: #9DCAB0; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2D7D58; }
+}
+
+@layer components {
+  .text-gradient {
+    background: linear-gradient(135deg, #1B5E43 0%, #2D7D58 50%, #D4A017 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #D97706 0%, #F59E0B 50%, #FCD34D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .card-premium {
+    background: white;
+    border: 1px solid rgba(27,94,67,0.08);
+    box-shadow: 0 4px 24px -4px rgba(15,58,41,0.08);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .card-premium:hover {
+    box-shadow: 0 16px 48px -8px rgba(15,58,41,0.16);
+    transform: translateY(-4px);
+  }
+  .input-premium {
+    @apply w-full rounded-2xl border border-forest-100 bg-white px-5 py-4 text-base
+    placeholder:text-forest-300 focus:outline-none focus:ring-2 focus:ring-forest-400/30
+    focus:border-forest-400 transition-all duration-200;
+  }
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-2xl bg-forest-600 px-6 py-3.5
+    text-sm font-semibold text-white shadow-lg hover:bg-forest-700 active:scale-95 transition-all duration-200;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-forest-200
+    bg-transparent px-6 py-3.5 text-sm font-semibold text-forest-700
+    hover:bg-forest-50 hover:border-forest-400 active:scale-95 transition-all duration-200;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: var(--font-cormorant); }
+  .font-body { font-family: var(--font-jakarta); }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
