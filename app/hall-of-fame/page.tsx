@@ -52,7 +52,10 @@ export default async function HallOfFamePage() {
                     <div className="absolute top-4 left-4 z-10 text-3xl">{["🥇", "🥈", "🥉"][i]}</div>
                     <div className="relative h-56 overflow-hidden">
                       {dish.image_url ? (
-                        <Image src={dish.image_url} alt={dish.dish_name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="400px" />
+                        <>
+                          <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="400px" />
+                          <img src={dish.image_url} alt={dish.dish_name} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
+                        </>
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-gold-100 to-gold-200 flex items-center justify-center">
                           <span className="text-6xl">🍽️</span>
@@ -88,7 +91,7 @@ export default async function HallOfFamePage() {
                         className="group flex items-center gap-4 bg-white rounded-2xl p-4 border border-forest-100/60 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300">
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
                           {dish.image_url
-                            ? <Image src={dish.image_url} alt={dish.dish_name} fill className="object-cover" sizes="64px" />
+                            ? <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover" sizes="64px" />
                             : <div className="w-full h-full bg-forest-100 flex items-center justify-center text-xl">🍽️</div>}
                         </div>
                         <div className="min-w-0">

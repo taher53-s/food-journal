@@ -24,7 +24,10 @@ export default async function RestaurantPage({ params }: { params: { id: string 
     <div className="min-h-screen pt-20 relative">
       <div className="relative h-96 md:h-[500px] overflow-hidden">
         {coverPhoto ? (
-          <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill className="object-cover" priority />
+          <>
+            <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover" priority />
+            <img src={coverPhoto.image_url} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
+          </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center">
             <span className="text-[120px] opacity-40">{getCuisineEmoji(visit.cuisine)}</span>
@@ -114,7 +117,8 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {visit.photos.map((photo: any, i: number) => (
                       <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
-                        <Image src={photo.image_url} alt={photo.caption || `Photo ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="300px" />
+                        <Image src={photo.image_url} alt={photo.caption || `Photo ${i + 1}`} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover hover:scale-105 transition-transform duration-500" sizes="300px" />
+                        <img src={photo.image_url} alt={photo.caption || `Photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
                       </div>
                     ))}
                   </div>

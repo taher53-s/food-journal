@@ -42,7 +42,9 @@ export default async function GalleryPage() {
                 <Link href={`/restaurants/${photo.visit_id}`}>
                   <div className="group relative break-inside-avoid rounded-2xl overflow-hidden cursor-pointer mb-4">
                     <Image src={photo.image_url} alt={photo.caption || "Food photo"} width={400} height={300}
+                      unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }}
                       className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={photo.image_url} alt={photo.caption || "Food photo"} className="w-full h-auto object-cover" style={{ zIndex: -1 }} />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent">
                       <p className="text-white text-xs font-semibold truncate">{photo.restaurant_visits?.restaurant_name}</p>

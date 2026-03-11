@@ -25,7 +25,10 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
       <Link href={`/restaurants/${visit.id}`} className="block">
         <div className="relative h-64 overflow-hidden">
           {coverPhoto ? (
-            <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => console.error("Broken image URL:", coverPhoto.image_url)} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
+            <>
+              <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error("Image failed:", e.currentTarget.src); e.currentTarget.style.display = "none"; }} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
+              <img src={coverPhoto.image_url} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" style={{ zIndex: -1 }} onError={(e) => console.error("Fallback img failed:", coverPhoto.image_url)} />
+            </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-forest-100 to-forest-200 flex items-center justify-center">
               <span className="text-6xl">{getCuisineEmoji(visit.cuisine)}</span>

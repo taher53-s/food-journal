@@ -56,7 +56,10 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
       )}
       <div className="relative h-44 overflow-hidden">
         {dish.image_url ? (
-          <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => console.error("Broken image URL:", dish.image_url)} className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="300px" />
+          <>
+            <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error("Image failed:", e.currentTarget.src); e.currentTarget.style.display = "none"; }} className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="300px" />
+            <img src={dish.image_url} alt={dish.dish_name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ zIndex: -1 }} onError={(e) => console.error("Fallback img failed:", dish.image_url)} />
+          </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-forest-50 to-cream-200 flex items-center justify-center">
             <span className="text-5xl">🍽️</span>
