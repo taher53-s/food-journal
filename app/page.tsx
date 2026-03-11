@@ -28,8 +28,9 @@ export default async function HomePage() {
               <span>{all.length} restaurants explored</span>
             </div>
           </FadeIn>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-tr from-gold-300/30 to-forest-400/30 rounded-full blur-3xl animate-pulse -z-10" />
           <FadeIn delay={0.1}>
-            <h1 className="font-display text-6xl md:text-8xl lg:text-9xl font-light text-forest-950 leading-[0.95] tracking-tight mb-6">
+            <h1 className="relative font-display text-6xl md:text-[160px] font-light text-forest-950 leading-[0.95] tracking-tight mb-6 z-10">
               My Food{" "}<span className="text-gradient italic">Journal</span>
             </h1>
           </FadeIn>
@@ -46,6 +47,20 @@ export default async function HomePage() {
               <Link href="/hall-of-fame" className="btn-secondary px-8 py-4 text-base">
                 🏆 Hall of Fame
               </Link>
+            </div>
+          </FadeIn>
+          <FadeIn delay={0.35}>
+            <div className="mt-12 overflow-hidden w-full max-w-lg mx-auto relative flex items-center">
+              <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#FAF7F0] to-transparent z-10 pointer-events-none" />
+              <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#FAF7F0] to-transparent z-10 pointer-events-none" />
+              <div className="flex w-[200%] animate-marquee">
+                <div className="flex-1 flex justify-around text-3xl opacity-80">
+                  🍕 🌮 🍣 🥘 🍝 🍔 🍜 🍛 🍲 🥐
+                </div>
+                <div className="flex-1 flex justify-around text-3xl opacity-80">
+                  🍕 🌮 🍣 🥘 🍝 🍔 🍜 🍛 🍲 🥐
+                </div>
+              </div>
             </div>
           </FadeIn>
           <FadeIn delay={0.4}>

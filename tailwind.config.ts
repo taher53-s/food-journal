@@ -64,11 +64,21 @@ const config: Config = {
       },
       animation: {
         float: "float 6s ease-in-out infinite",
+        marquee: "marquee 20s linear infinite",
+        shimmer: "shimmer 2s linear infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-12px)" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
         },
       },
     },

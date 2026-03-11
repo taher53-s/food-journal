@@ -30,7 +30,20 @@ export default async function AnalyticsPage() {
   all.forEach((v: any) => { const month = v.date_visited.substring(0, 7); monthCounts[month] = (monthCounts[month] || 0) + 1; });
   const monthlyVisits = Object.entries(monthCounts).sort((a, b) => a[0].localeCompare(b[0])).slice(-12).map(([month, count]) => ({ month, count }));
 
-  const data = { totalRestaurants, averageRating, favoriteCuisines, topRatedRestaurants, priceDistribution, occasionBreakdown, monthlyVisits };
+  let streak = 0;
+  if (monthlyVisits.length > 0) {
+    const dates = monthlyVisits.map(m => new Date(m.month + "-01"));
+    streak = 1;
+    for (let i = dates.length - 1; i > 0; i--) {
+      const current = dates[i];
+      const prev = dates[i - 1];
+      const diffMonths = (current.getFullYear() - prev.getFullYear()) * 12 + current.getMonth() - prev.getMonth();
+      if (diffMonths === 1) streak++;
+      else break;
+    }
+  }
+
+  const data = { totalRestaurants, averageRating, favoriteCuisines, topRatedRestaurants, priceDistribution, occasionBreakdown, monthlyVisits, streak };
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4">

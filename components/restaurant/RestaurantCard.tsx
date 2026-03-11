@@ -16,14 +16,16 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
       initial={{ opacity: 0, y: 32 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22,1,0.36,1] }}
+      transition={{ duration: 0.5, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -6 }}
-      className="group relative bg-white rounded-3xl overflow-hidden border border-forest-100/60 shadow-card hover:shadow-card-hover transition-all duration-300"
+      className={cn("group relative bg-white rounded-3xl overflow-hidden border border-forest-100/60 shadow-card hover:shadow-card-hover transition-all duration-300",
+        visit.recommendation_level === "must_try" ? "border-l-4 border-l-forest-500" : visit.recommendation_level === "worth_it" ? "border-l-4 border-l-gold-500" : ""
+      )}
     >
       <Link href={`/restaurants/${visit.id}`} className="block">
-        <div className="relative h-52 overflow-hidden">
+        <div className="relative h-64 overflow-hidden">
           {coverPhoto ? (
-            <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
+            <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => console.error("Broken image URL:", coverPhoto.image_url)} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-forest-100 to-forest-200 flex items-center justify-center">
               <span className="text-6xl">{getCuisineEmoji(visit.cuisine)}</span>

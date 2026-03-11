@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Menu, X, ChefHat } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
@@ -21,6 +21,8 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -39,10 +41,11 @@ export function Navbar() {
 
   return (
     <>
+      <motion.div className="fixed top-0 left-0 right-0 h-[2px] bg-forest-600 z-[60] origin-left" style={{ scaleX }} />
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.22,1,0.36,1] }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
           scrolled ? "bg-white/90 backdrop-blur-xl border-b border-forest-100/60 shadow-sm" : "bg-transparent"
@@ -52,14 +55,17 @@ export function Navbar() {
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link href="/" className="flex items-center gap-2.5 group">
               <motion.div
-                whileHover={{ rotate: [0,-10,10,0], scale: 1.05 }}
+                whileHover={{ rotate: [0, -10, 10, 0], scale: 1.05 }}
                 transition={{ duration: 0.4 }}
                 className="w-9 h-9 bg-forest-600 rounded-xl flex items-center justify-center shadow-md"
               >
                 <ChefHat className="w-5 h-5 text-white" />
               </motion.div>
               <div>
-                <span className="font-display text-xl font-semibold text-forest-900 tracking-tight">FoodLog</span>
+                <span className="font-display text-xl font-semibold text-forest-900 tracking-tight relative overflow-hidden group-hover:text-forest-700 transition-colors inline-block">
+                  FoodLog
+                  <span className="absolute inset-0 -translate-x-full group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                </span>
                 <span className="hidden sm:block text-[10px] text-forest-500 font-medium -mt-0.5 tracking-widest uppercase">Personal Journal</span>
               </div>
             </Link>

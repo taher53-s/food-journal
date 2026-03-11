@@ -6,6 +6,7 @@ import Link from "next/link";
 import { RatingBadge, RatingBar } from "@/components/ui/RatingBadge";
 import { DishCard } from "@/components/restaurant/DishCard";
 import { FadeIn } from "@/components/animations/PageTransition";
+import { CopyButton } from "@/components/ui/CopyButton";
 import { formatDate, getCuisineEmoji, occasionLabel, occasionEmoji, priceRangeLabel, recommendationLabel, recommendationColor, cn } from "@/lib/utils";
 import { DeleteVisitButton } from "@/components/admin/DeleteVisitButton";
 
@@ -20,8 +21,8 @@ export default async function RestaurantPage({ params }: { params: { id: string 
   const coverPhoto = visit.photos?.find((p: any) => p.type === "food") || visit.photos?.[0];
 
   return (
-    <div className="min-h-screen pt-20">
-      <div className="relative h-72 md:h-96 overflow-hidden">
+    <div className="min-h-screen pt-20 relative">
+      <div className="relative h-96 md:h-[500px] overflow-hidden">
         {coverPhoto ? (
           <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill className="object-cover" priority />
         ) : (
@@ -62,9 +63,17 @@ export default async function RestaurantPage({ params }: { params: { id: string 
           <div className="lg:col-span-2 space-y-8">
             {visit.experience_notes && (
               <FadeIn>
-                <div className="bg-white rounded-3xl p-8 shadow-card border border-forest-100/60">
-                  <h2 className="font-display text-2xl font-semibold text-forest-900 mb-4">The Experience</h2>
-                  <p className="text-forest-700 leading-loose text-xl font-light italic font-display">&ldquo;{visit.experience_notes}&rdquo;</p>
+                <div className="bg-white rounded-3xl p-8 md:p-12 shadow-card border border-forest-100/60 relative overflow-hidden">
+                  <div className="absolute top-4 left-4 text-forest-100 font-display text-9xl opacity-50 select-none">&ldquo;</div>
+                  <div className="relative z-10">
+                    <h2 className="font-display text-2xl font-semibold text-forest-900 mb-6 flex items-center gap-2">
+                      <span className="w-8 h-[2px] bg-forest-300" />
+                      The Experience
+                    </h2>
+                    <p className="text-forest-700 leading-relaxed text-xl md:text-2xl font-light italic font-display border-l-4 border-forest-400 pl-6 py-2">
+                      {visit.experience_notes}
+                    </p>
+                  </div>
                 </div>
               </FadeIn>
             )}
@@ -163,6 +172,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
           </div>
         </div>
       </div>
+      <CopyButton />
     </div>
   );
 }

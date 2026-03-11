@@ -8,8 +8,8 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
-const CUISINES = ["All","Italian","Japanese","Indian","Mexican","French","Chinese","Thai","Mediterranean","American","Korean"];
-const PRICE_RANGES = [{ value:"all",label:"Any Price" },{ value:"budget",label:"$ Budget" },{ value:"moderate",label:"$$ Moderate" },{ value:"expensive",label:"$$$ Expensive" },{ value:"luxury",label:"$$$$ Luxury" }];
+const CUISINES = ["All", "Italian", "Japanese", "Indian", "Mexican", "French", "Chinese", "Thai", "Mediterranean", "American", "Korean"];
+const PRICE_RANGES = [{ value: "all", label: "Any Price" }, { value: "budget", label: "$ Budget" }, { value: "moderate", label: "$$ Moderate" }, { value: "expensive", label: "$$$ Expensive" }, { value: "luxury", label: "$$$$ Luxury" }];
 
 export default function RestaurantsPage() {
   const [visits, setVisits] = useState<RestaurantVisit[]>([]);
@@ -127,10 +127,10 @@ export default function RestaurantsPage() {
             </AnimatePresence>
           </motion.div>
         ) : (
-          <div className="text-center py-24">
-            <div className="text-5xl mb-4">🔍</div>
-            <h3 className="font-display text-2xl text-forest-800 mb-2">No results found</h3>
-            <p className="text-forest-500 text-sm">Try adjusting your filters</p>
+          <div className="text-center py-24 px-4 bg-gradient-to-tr from-cream-200 to-forest-50 border border-forest-100/50 rounded-4xl max-w-2xl mx-auto shadow-card">
+            <div className="text-7xl mb-6 animate-pulse">🔍</div>
+            <h3 className="font-display text-2xl text-forest-900 mb-2 font-semibold">No results found</h3>
+            <p className="text-forest-600">Try adjusting your filters or search terms.</p>
           </div>
         )}
       </div>

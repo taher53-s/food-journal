@@ -3,14 +3,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
+import heic2any from "heic2any";
 import { FlavorTagSelector } from "@/components/ui/FlavorTag";
 import { FlavorTag } from "@/types";
 import { Plus, Trash2, Upload } from "lucide-react";
 
-const OCCASIONS = ["date","friends","family","solo","business","celebration"];
-const PRICE_RANGES = ["budget","moderate","expensive","luxury"];
-const RECOMMENDATION_LEVELS = ["must_try","worth_it","decent","skip"];
-const CUISINES = ["Italian","Japanese","Indian","Mexican","French","Chinese","Thai","Mediterranean","American","Korean","Spanish","New Nordic","Middle Eastern","Vietnamese","Greek","Other"];
+const OCCASIONS = ["date", "friends", "family", "solo", "business", "celebration"];
+const PRICE_RANGES = ["budget", "moderate", "expensive", "luxury"];
+const RECOMMENDATION_LEVELS = ["must_try", "worth_it", "decent", "skip"];
+const CUISINES = ["Italian", "Japanese", "Indian", "Mexican", "French", "Chinese", "Thai", "Mediterranean", "American", "Korean", "Spanish", "New Nordic", "Middle Eastern", "Vietnamese", "Greek", "Other"];
 
 interface DishEntry {
   dish_name: string; price: string; rating: number;
@@ -37,6 +38,7 @@ function RatingSlider({ label, value, onChange }: { label: string; value: number
 export function VisitForm({ initialData, visitId }: { initialData?: any; visitId?: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     restaurant_name: initialData?.restaurant_name || "",
@@ -89,12 +91,48 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
         if (!dish.dish_name) continue;
         let image_url = null;
         if (dish.image) {
-          const ext = dish.image.name.split(".").pop();
+          let fileToUpload = dish.image;
+          let filename = dish.image.name;
+          let ext = filename.split(".").pop()?.toLowerCase() || '';
+
+          if (ext === "heic" || ext === "heif") {
+            setIsConverting(true);
+            try {
+              const convertedBlob = await heic2any({
+                blob: dish.image,
+                toType: "image/jpeg",
+                quality: 0.8,
+              });
+              const blobArray = Array.isArray(convertedBlob) ? convertedBlob : [convertedBlob];
+              const blob = blobArray[0];
+              fileToUpload = new File([blob], filename.replace(/\.heic|\.heif/i, ".jpg"), {
+                type: "image/jpeg"
+              });
+              ext = "jpg";
+            } catch (convErr: any) {
+              console.error("HEIC conversion failed:", convErr);
+              throw new Error("Failed to convert HEIC/HEIF image. Please try another format.");
+            } finally {
+              setIsConverting(false);
+            }
+          }
+
           const path = `${visitResult.id}/${Date.now()}.${ext}`;
-          const { data: up, error: upErr } = await supabase.storage.from("food-photos").upload(path, dish.image);
+
+          const { data: up, error: upErr } = await supabase.storage.from("food-photos").upload(path, fileToUpload, {
+            contentType: fileToUpload.type,
+            upsert: false
+          });
+
           if (!upErr && up) {
             const { data: { publicUrl } } = supabase.storage.from("food-photos").getPublicUrl(up.path);
+            if (!publicUrl) {
+              throw new Error("Failed to receive public URL for the uploaded image.");
+            }
+            console.log("Uploaded image publicUrl:", publicUrl);
             image_url = publicUrl;
+          } else if (upErr) {
+            throw upErr;
           }
         }
         await supabase.from("dishes").insert({
@@ -145,7 +183,7 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
               {PRICE_RANGES.map((p) => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select></div>
           <div><label className={labelClass}>Recommendation</label>
             <select value={form.recommendation_level} onChange={(e) => setField("recommendation_level", e.target.value)} className={inputClass}>
-              {RECOMMENDATION_LEVELS.map((r) => <option key={r} value={r}>{r.replace(/_/g," ").replace(/\b\w/g,(c) => c.toUpperCase())}</option>)}</select></div>
+              {RECOMMENDATION_LEVELS.map((r) => <option key={r} value={r}>{r.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}</select></div>
           <div><label className={labelClass}>Companions</label>
             <input type="text" value={form.companions} onChange={(e) => setField("companions", e.target.value)} placeholder="Who did you go with?" className={inputClass} /></div>
         </div>
@@ -191,21 +229,21 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
               </button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input type="text" placeholder="Dish name" value={dish.dish_name} onChange={(e) => updateDish(i,"dish_name",e.target.value)} className={inputClass} />
-              <input type="number" placeholder="Price (₹)" value={dish.price} onChange={(e) => updateDish(i,"price",e.target.value)} className={inputClass} />
+              <input type="text" placeholder="Dish name" value={dish.dish_name} onChange={(e) => updateDish(i, "dish_name", e.target.value)} className={inputClass} />
+              <input type="number" placeholder="Price (₹)" value={dish.price} onChange={(e) => updateDish(i, "price", e.target.value)} className={inputClass} />
             </div>
-            <RatingSlider label="Rating" value={dish.rating} onChange={(v) => updateDish(i,"rating",v)} />
-            <textarea placeholder="Notes on taste, texture..." value={dish.notes} onChange={(e) => updateDish(i,"notes",e.target.value)} rows={2} className={`${inputClass} resize-none`} />
+            <RatingSlider label="Rating" value={dish.rating} onChange={(v) => updateDish(i, "rating", v)} />
+            <textarea placeholder="Notes on taste, texture..." value={dish.notes} onChange={(e) => updateDish(i, "notes", e.target.value)} rows={2} className={`${inputClass} resize-none`} />
             <div>
               <label className="text-xs font-semibold text-forest-600 uppercase tracking-wider mb-2 block">Flavor Tags</label>
-              <FlavorTagSelector selected={dish.flavor_tags} onChange={(tags) => updateDish(i,"flavor_tags",tags)} />
+              <FlavorTagSelector selected={dish.flavor_tags} onChange={(tags) => updateDish(i, "flavor_tags", tags)} />
             </div>
             <div>
               <label className="text-xs font-semibold text-forest-600 uppercase tracking-wider mb-2 block">Photo</label>
               <label className="flex items-center gap-3 cursor-pointer bg-white border-2 border-dashed border-forest-200 rounded-xl px-4 py-3 hover:border-forest-400 transition-colors">
                 <Upload className="w-4 h-4 text-forest-500" />
                 <span className="text-sm text-forest-600">{dish.image ? dish.image.name : "Upload dish photo"}</span>
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => updateDish(i,"image",e.target.files?.[0] || null)} />
+                <input type="file" accept="image/*,.heic,.heif" className="hidden" onChange={(e) => updateDish(i, "image", e.target.files?.[0] || null)} />
               </label>
             </div>
           </motion.div>
@@ -220,11 +258,11 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
 
       {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-3">{error}</p>}
 
-      <button type="submit" disabled={loading} className="btn-primary w-full py-4 text-base disabled:opacity-60">
-        {loading ? (
+      <button type="submit" disabled={loading || isConverting} className="btn-primary w-full py-4 text-base disabled:opacity-60">
+        {loading || isConverting ? (
           <span className="flex items-center gap-2">
             <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-            Saving...
+            {isConverting ? "Converting image..." : "Saving..."}
           </span>
         ) : visitId ? "Update Visit" : "Save Visit 🎉"}
       </button>

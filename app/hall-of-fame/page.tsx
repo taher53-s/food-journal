@@ -5,6 +5,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/P
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { FlavorTag } from "@/components/ui/FlavorTag";
 import { cn } from "@/lib/utils";
+import { ConfettiBlast } from "@/components/ui/ConfettiBlast";
 
 export const metadata = { title: "Hall of Fame" };
 
@@ -19,7 +20,8 @@ export default async function HallOfFamePage() {
   const all = dishes || [];
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4">
+    <div className="min-h-screen pt-24 pb-20 px-4 relative">
+      <ConfettiBlast />
       <div className="max-w-7xl mx-auto">
         <FadeIn>
           <div className="text-center mb-16">
@@ -46,7 +48,8 @@ export default async function HallOfFamePage() {
                 <FadeIn key={dish.id} delay={i * 0.1}>
                   <Link href={`/restaurants/${dish.visit_id}`}
                     className="group relative block bg-white rounded-3xl overflow-hidden border border-forest-100/60 shadow-luxury hover:-translate-y-2 hover:shadow-glow-gold transition-all duration-300">
-                    <div className="absolute top-4 left-4 z-10 text-3xl">{["🥇","🥈","🥉"][i]}</div>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-gold-300/0 via-gold-200/0 to-gold-400/0 group-hover:via-gold-300/30 group-hover:to-gold-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20" />
+                    <div className="absolute top-4 left-4 z-10 text-3xl">{["🥇", "🥈", "🥉"][i]}</div>
                     <div className="relative h-56 overflow-hidden">
                       {dish.image_url ? (
                         <Image src={dish.image_url} alt={dish.dish_name} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="400px" />

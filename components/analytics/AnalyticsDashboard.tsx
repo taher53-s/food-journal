@@ -3,14 +3,14 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/P
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { getCuisineEmoji, occasionLabel } from "@/lib/utils";
 
-const COLORS = ["#1B5E43","#2D7D58","#5EA882","#9DCAB0","#D4A017","#F59E0B","#C4633F","#E07B3B"];
+const COLORS = ["#1B5E43", "#2D7D58", "#5EA882", "#9DCAB0", "#D4A017", "#F59E0B", "#C4633F", "#E07B3B"];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white border border-forest-100 rounded-2xl shadow-card-hover p-3 text-sm">
-        <p className="font-semibold text-forest-800">{label}</p>
-        <p className="text-forest-600">{payload[0].value}</p>
+      <div className="bg-forest-900 border border-forest-800 rounded-2xl shadow-luxury p-3 text-sm">
+        <p className="font-semibold text-gold-400">{label}</p>
+        <p className="text-white">{payload[0].value}</p>
       </div>
     );
   }
@@ -41,6 +41,7 @@ export function AnalyticsDashboard({ data }: { data: any }) {
     <div className="space-y-8">
       <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StaggerItem><StatCard icon="🍽️" label="Restaurants" value={data.totalRestaurants} /></StaggerItem>
+        <StaggerItem><StatCard icon="🔥" label="Visit Streak" value={data.streak || 0} sub="months" /></StaggerItem>
         <StaggerItem><StatCard icon="⭐" label="Avg Rating" value={data.averageRating || "—"} sub="out of 10" /></StaggerItem>
         <StaggerItem><StatCard icon="🌍" label="Cuisines" value={(data.favoriteCuisines || []).length} sub="explored" /></StaggerItem>
         <StaggerItem>
@@ -60,7 +61,7 @@ export function AnalyticsDashboard({ data }: { data: any }) {
                   <XAxis type="number" tick={{ fontSize: 11, fill: "#5EA882" }} axisLine={false} tickLine={false} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#2D7D58" }} axisLine={false} tickLine={false} width={130} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="count" radius={[0,8,8,0]}>
+                  <Bar dataKey="count" radius={[0, 8, 8, 0]}>
                     {cuisinesWithEmoji.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Bar>
                 </BarChart>
@@ -112,7 +113,7 @@ export function AnalyticsDashboard({ data }: { data: any }) {
                   <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#5EA882" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "#5EA882" }} axisLine={false} tickLine={false} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="count" radius={[8,8,0,0]}>
+                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                     {occasionData.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Bar>
                 </BarChart>

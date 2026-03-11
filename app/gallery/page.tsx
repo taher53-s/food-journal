@@ -30,9 +30,10 @@ export default async function GalleryPage() {
         </FadeIn>
 
         {all.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="text-5xl mb-4">📸</div>
-            <p className="text-forest-500">No photos yet. Start adding restaurant visits with photos!</p>
+          <div className="text-center py-24 px-4 bg-gradient-to-tr from-cream-200 to-forest-50 border border-forest-100/50 rounded-4xl max-w-2xl mx-auto shadow-card">
+            <div className="text-7xl mb-6">📸</div>
+            <h3 className="font-display text-2xl text-forest-900 mb-2 font-semibold">No memories yet</h3>
+            <p className="text-forest-600">Start discovering new places and capture your favorites!</p>
           </div>
         ) : (
           <StaggerContainer className="columns-2 sm:columns-3 lg:columns-4 gap-4 space-y-4">

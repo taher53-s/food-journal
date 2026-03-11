@@ -9,7 +9,7 @@ import { Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
-const rankEmoji = ["🥇","🥈","🥉"];
+const rankEmoji = ["🥇", "🥈", "🥉"];
 const rankColors = [
   "bg-gradient-to-br from-gold-100 to-gold-50 border-gold-200",
   "bg-gradient-to-br from-gray-100 to-gray-50 border-gray-200",
@@ -56,7 +56,7 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
       )}
       <div className="relative h-44 overflow-hidden">
         {dish.image_url ? (
-          <Image src={dish.image_url} alt={dish.dish_name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="300px" />
+          <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => console.error("Broken image URL:", dish.image_url)} className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="300px" />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-forest-50 to-cream-200 flex items-center justify-center">
             <span className="text-5xl">🍽️</span>
