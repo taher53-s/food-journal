@@ -53,7 +53,7 @@ export default async function HomePage() {
               {[
                 { icon: "🍽️", label: "Restaurants", value: all.length },
                 { icon: "⭐", label: "Avg Rating", value: avgRating },
-                { icon: "🌍", label: "Cuisines", value: [...new Set(all.map((v: any) => v.cuisine))].length },
+                { icon: "🌍", label: "Cuisines", value: Array.from(new Set(all.map((v: any) => v.cuisine))).length },
                 { icon: "🥇", label: "Must-Tries", value: all.filter((v: any) => v.recommendation_level === "must_try").length },
               ].map((stat) => (
                 <div key={stat.label} className="bg-white/70 backdrop-blur border border-forest-100 rounded-2xl p-4 text-center">

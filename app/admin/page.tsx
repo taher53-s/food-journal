@@ -41,7 +41,7 @@ export default async function AdminPage() {
           {[
             { icon: "🍽️", label: "Total Visits", value: all.length },
             { icon: "⭐", label: "Avg Rating", value: avgRating },
-            { icon: "🌍", label: "Cuisines", value: [...new Set(all.map((v: any) => v.cuisine))].length },
+            { icon: "🌍", label: "Cuisines", value: Array.from(new Set(all.map((v: any) => v.cuisine))).length },
             { icon: "🥇", label: "Must-Tries", value: all.filter((v: any) => v.recommendation_level === "must_try").length },
           ].map((stat) => (
             <StaggerItem key={stat.label}>
