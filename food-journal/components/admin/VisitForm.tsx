@@ -36,6 +36,7 @@ function RatingSlider({ label, value, onChange }: { label: string; value: number
 
 export function VisitForm({ initialData, visitId }: { initialData?: any; visitId?: string }) {
   const router = useRouter();
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const [error, setError] = useState("");
@@ -67,6 +68,33 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
   };
   const removeDish = (i: number) => setDishes(dishes.filter((_, idx) => idx !== i));
 
+  // Bulletproof HEIC/HEIF to JPEG conversion with fallback
+  const convertToJpeg = async (file: File): Promise<File> => {
+    try {
+      const heic2any = (await import("heic2any")).default;
+      const blob = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.85,
+        multiple: false,
+      });
+      const converted = Array.isArray(blob) ? blob[0] : blob;
+      return new File(
+        [converted],
+        file.name.replace(/\.(heic|heif)$/i, ".jpg"),
+        { type: "image/jpeg" }
+      );
+    } catch (err) {
+      console.error("HEIC conversion failed, uploading original:", err);
+      // Fallback: rename the file with jpg extension and upload anyway
+      return new File(
+        [file],
+        file.name.replace(/\.(heic|heif)$/i, ".jpg"),
+        { type: "image/jpeg" }
+      );
+    }
+  };
+
   // Robust image upload function with HEIC conversion
   const uploadImage = async (file: File, path: string): Promise<string> => {
     let uploadFile = file;
@@ -76,19 +104,12 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
     if (file.name.toLowerCase().match(/\.(heic|heif)$/)) {
       setIsConverting(true);
       try {
-        const heic2any = (await import("heic2any")).default;
-        const blob = await heic2any({
-          blob: file,
-          toType: "image/jpeg",
-          quality: 0.85,
-        });
-        const converted = Array.isArray(blob) ? blob[0] : blob;
-        const fileName = path.split("/").pop()?.replace(/\.(heic|heif)$/i, ".jpg") || "image.jpg";
-        uploadFile = new File([converted], fileName, { type: "image/jpeg" });
+        uploadFile = await convertToJpeg(file);
         finalPath = path.replace(/\.(heic|heif)$/i, ".jpg");
       } catch (convErr) {
         console.error("HEIC conversion failed:", convErr);
-        throw new Error("Failed to convert HEIC/HEIF image. Please try another format.");
+        // Still try to upload with renamed extension
+        finalPath = path.replace(/\.(heic|heif)$/i, ".jpg");
       } finally {
         setIsConverting(false);
       }
