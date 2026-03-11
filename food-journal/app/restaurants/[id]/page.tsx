@@ -29,13 +29,13 @@ export default async function RestaurantPage({ params }: { params: { id: string 
             onError={(e) => {
               console.error('Image load failed:', coverPhoto.image_url);
               (e.target as HTMLImageElement).style.display = 'none';
+              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
             }}
           />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center">
-            <span className="text-[120px] opacity-40">{getCuisineEmoji(visit.cuisine)}</span>
-          </div>
-        )}
+        ) : null}
+        <div className={`${coverPhoto ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center`}>
+          <span className="text-[120px] opacity-40">{getCuisineEmoji(visit.cuisine)}</span>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute top-6 left-6">
           <Link href="/restaurants" className="flex items-center gap-2 bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-white/30 transition-all">
@@ -112,15 +112,27 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {visit.photos.map((photo: any, i: number) => (
                       <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
-                        <img 
-                          src={photo.image_url} 
-                          alt={photo.caption || `Photo ${i + 1}`} 
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                          onError={(e) => {
-                            console.error('Image load failed:', photo.image_url);
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
+                        {photo.image_url ? (
+                          <>
+                            <img 
+                              src={photo.image_url} 
+                              alt={photo.caption || `Photo ${i + 1}`} 
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                              onError={(e) => {
+                                console.error('Image load failed:', photo.image_url);
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                            <div className="hidden w-full h-full bg-forest-100 flex items-center justify-center">
+                              <span className="text-2xl">🖼️</span>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="w-full h-full bg-forest-100 flex items-center justify-center">
+                            <span className="text-2xl">🖼️</span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

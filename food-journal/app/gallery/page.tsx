@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/PageTransition";
+import Image from "next/image";
 
 export const metadata = { title: "Gallery" };
 
@@ -39,15 +40,21 @@ export default async function GalleryPage() {
               <StaggerItem key={photo.id}>
                 <Link href={`/restaurants/${photo.visit_id}`}>
                   <div className="group relative break-inside-avoid rounded-2xl overflow-hidden cursor-pointer mb-4">
-                    <img 
-                      src={photo.image_url} 
-                      alt={photo.caption || "Food photo"} 
-                      className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
-                      onError={(e) => {
-                        console.error('Image load failed:', photo.image_url);
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
+                    {photo.image_url ? (
+                      <img 
+                        src={photo.image_url} 
+                        alt={photo.caption || "Food photo"} 
+                        className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Image load failed:', photo.image_url);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                          (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                    ) : null}
+                    <div className={`${photo.image_url ? 'hidden' : ''} w-full h-48 bg-forest-100 flex items-center justify-center`}>
+                      <span className="text-4xl">🍽️</span>
+                    </div>
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/60 to-transparent">
                       <p className="text-white text-xs font-semibold truncate">{photo.restaurant_visits?.restaurant_name}</p>
