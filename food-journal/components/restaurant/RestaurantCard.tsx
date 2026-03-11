@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Calendar, Users, ArrowRight } from "lucide-react";
 import { RestaurantVisit } from "@/types";
@@ -23,13 +22,10 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
       <Link href={`/restaurants/${visit.id}`} className="block">
         <div className="relative h-52 overflow-hidden">
           {coverPhoto ? (
-            <Image 
+            <img 
               src={coverPhoto.image_url} 
               alt={visit.restaurant_name} 
-              fill 
-              className="object-cover transition-transform duration-700 group-hover:scale-110" 
-              sizes="(max-width:768px) 100vw, 50vw"
-              unoptimized={true}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               onError={(e) => {
                 console.error('Image load failed:', coverPhoto.image_url);
                 (e.target as HTMLImageElement).style.display = 'none';

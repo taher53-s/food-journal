@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { Dish } from "@/types";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { FlavorTag } from "@/components/ui/FlavorTag";
@@ -56,13 +55,10 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
       )}
       <div className="relative h-44 overflow-hidden">
         {dish.image_url ? (
-          <Image 
+          <img 
             src={dish.image_url} 
             alt={dish.dish_name} 
-            fill 
-            className="object-cover transition-transform duration-500 group-hover:scale-105" 
-            sizes="300px"
-            unoptimized={true}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
               console.error('Image load failed:', dish.image_url);
               (e.target as HTMLImageElement).style.display = 'none';

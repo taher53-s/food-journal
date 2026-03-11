@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import { MapPin, Calendar, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { RatingBadge, RatingBar } from "@/components/ui/RatingBadge";
@@ -23,13 +22,10 @@ export default async function RestaurantPage({ params }: { params: { id: string 
     <div className="min-h-screen pt-20">
       <div className="relative h-72 md:h-96 overflow-hidden">
         {coverPhoto ? (
-          <Image 
+          <img 
             src={coverPhoto.image_url} 
             alt={visit.restaurant_name} 
-            fill 
-            className="object-cover" 
-            priority 
-            unoptimized={true}
+            className="w-full h-full object-cover"
             onError={(e) => {
               console.error('Image load failed:', coverPhoto.image_url);
               (e.target as HTMLImageElement).style.display = 'none';
@@ -116,13 +112,10 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {visit.photos.map((photo: any, i: number) => (
                       <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
-                        <Image 
+                        <img 
                           src={photo.image_url} 
                           alt={photo.caption || `Photo ${i + 1}`} 
-                          fill 
-                          className="object-cover hover:scale-105 transition-transform duration-500" 
-                          sizes="300px"
-                          unoptimized={true}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                           onError={(e) => {
                             console.error('Image load failed:', photo.image_url);
                             (e.target as HTMLImageElement).style.display = 'none';

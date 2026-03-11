@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import Image from "next/image";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/PageTransition";
 
@@ -40,13 +39,10 @@ export default async function GalleryPage() {
               <StaggerItem key={photo.id}>
                 <Link href={`/restaurants/${photo.visit_id}`}>
                   <div className="group relative break-inside-avoid rounded-2xl overflow-hidden cursor-pointer mb-4">
-                    <Image 
+                    <img 
                       src={photo.image_url} 
                       alt={photo.caption || "Food photo"} 
-                      width={400} 
-                      height={300}
                       className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-500"
-                      unoptimized={true}
                       onError={(e) => {
                         console.error('Image load failed:', photo.image_url);
                         (e.target as HTMLImageElement).style.display = 'none';

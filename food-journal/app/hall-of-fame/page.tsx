@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import Image from "next/image";
 import Link from "next/link";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/PageTransition";
 import { RatingBadge } from "@/components/ui/RatingBadge";
@@ -49,13 +48,10 @@ export default async function HallOfFamePage() {
                     <div className="absolute top-4 left-4 z-10 text-3xl">{["🥇","🥈","🥉"][i]}</div>
                     <div className="relative h-56 overflow-hidden">
                       {dish.image_url ? (
-                        <Image 
+                        <img 
                           src={dish.image_url} 
                           alt={dish.dish_name} 
-                          fill 
-                          className="object-cover group-hover:scale-105 transition-transform duration-700" 
-                          sizes="400px"
-                          unoptimized={true}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                           onError={(e) => {
                             console.error('Image load failed:', dish.image_url);
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -96,13 +92,10 @@ export default async function HallOfFamePage() {
                         className="group flex items-center gap-4 bg-white rounded-2xl p-4 border border-forest-100/60 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300">
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
                           {dish.image_url
-                            ? <Image 
+                            ? <img 
                                 src={dish.image_url} 
                                 alt={dish.dish_name} 
-                                fill 
-                                className="object-cover" 
-                                sizes="64px"
-                                unoptimized={true}
+                                className="w-full h-full object-cover"
                                 onError={(e) => {
                                   console.error('Image load failed:', dish.image_url);
                                   (e.target as HTMLImageElement).style.display = 'none';
