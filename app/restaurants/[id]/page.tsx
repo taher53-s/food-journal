@@ -9,6 +9,51 @@ import { FadeIn } from "@/components/animations/PageTransition";
 import { CopyButton } from "@/components/ui/CopyButton";
 import { formatDate, getCuisineEmoji, occasionLabel, occasionEmoji, priceRangeLabel, recommendationLabel, recommendationColor, cn } from "@/lib/utils";
 import { DeleteVisitButton } from "@/components/admin/DeleteVisitButton";
+import fs from "fs";
+import path from "path";
+
+const LOCAL_IMAGE_MAP: Record<string, string[]> = {
+  "1441 Pizzeria": [
+    "/images/1441-pizzeria/IMG_5638.jpg",
+    "/images/1441-pizzeria/IMG_5641.jpg",
+    "/images/1441-pizzeria/IMG_5642.jpg",
+    "/images/1441-pizzeria/IMG_5643.jpg",
+    "/images/1441-pizzeria/IMG_5645.jpg",
+    "/images/1441-pizzeria/IMG_5647.jpg",
+    "/images/1441-pizzeria/IMG_5648.jpg",
+    "/images/1441-pizzeria/IMG_5649.jpg",
+    "/images/1441-pizzeria/IMG_5651.jpg",
+    "/images/1441-pizzeria/IMG_5656.jpg",
+    "/images/1441-pizzeria/IMG_5658.jpg",
+    "/images/1441-pizzeria/IMG_5662.jpg",
+    "/images/1441-pizzeria/IMG_5663.jpg",
+    "/images/1441-pizzeria/IMG_5664.jpg",
+    "/images/1441-pizzeria/IMG_5666.jpg",
+    "/images/1441-pizzeria/IMG_5668.JPEG",
+  ],
+  "1441": [
+    "/images/1441-pizzeria/IMG_5638.jpg",
+    "/images/1441-pizzeria/IMG_5641.jpg",
+    "/images/1441-pizzeria/IMG_5642.jpg",
+    "/images/1441-pizzeria/IMG_5643.jpg",
+    "/images/1441-pizzeria/IMG_5645.jpg",
+    "/images/1441-pizzeria/IMG_5647.jpg",
+    "/images/1441-pizzeria/IMG_5648.jpg",
+    "/images/1441-pizzeria/IMG_5649.jpg",
+    "/images/1441-pizzeria/IMG_5651.jpg",
+    "/images/1441-pizzeria/IMG_5656.jpg",
+    "/images/1441-pizzeria/IMG_5658.jpg",
+    "/images/1441-pizzeria/IMG_5662.jpg",
+    "/images/1441-pizzeria/IMG_5663.jpg",
+    "/images/1441-pizzeria/IMG_5664.jpg",
+    "/images/1441-pizzeria/IMG_5666.jpg",
+    "/images/1441-pizzeria/IMG_5668.JPEG",
+  ],
+};
+
+function getLocalImages(restaurantName: string): string[] {
+  return LOCAL_IMAGE_MAP[restaurantName] || [];
+}
 
 export default async function RestaurantPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -18,15 +63,26 @@ export default async function RestaurantPage({ params }: { params: { id: string 
   const { data: { user } } = await supabase.auth.getUser();
   const isAdmin = !!user;
   const sortedDishes = visit.dishes ? [...visit.dishes].sort((a: any, b: any) => b.rating - a.rating) : [];
-  const coverPhoto = visit.photos?.find((p: any) => p.type === "food") || visit.photos?.[0];
+  
+  // Get local images
+  const localImages = getLocalImages(visit.restaurant_name);
+  
+  // Map photos to local images if available
+  const photosWithLocal = visit.photos?.map((photo: any, idx: number) => ({
+    ...photo,
+    localUrl: localImages[idx] || null
+  })) || [];
+  
+  const coverPhoto = photosWithLocal.find((p: any) => p.type === "food") || photosWithLocal[0];
+  const displayImageUrl = coverPhoto?.localUrl || coverPhoto?.image_url;
 
   return (
     <div className="min-h-screen pt-20 relative">
       <div className="relative h-96 md:h-[500px] overflow-hidden">
-        {coverPhoto ? (
+        {displayImageUrl ? (
           <>
-            <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover" priority />
-            <img src={coverPhoto.image_url} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
+            <Image src={displayImageUrl} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover" priority />
+            <img src={displayImageUrl} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} onError={(e) => { console.error('Fallback img failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} />
           </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center">
@@ -66,17 +122,9 @@ export default async function RestaurantPage({ params }: { params: { id: string 
           <div className="lg:col-span-2 space-y-8">
             {visit.experience_notes && (
               <FadeIn>
-                <div className="bg-white rounded-3xl p-8 md:p-12 shadow-card border border-forest-100/60 relative overflow-hidden">
-                  <div className="absolute top-4 left-4 text-forest-100 font-display text-9xl opacity-50 select-none">&ldquo;</div>
-                  <div className="relative z-10">
-                    <h2 className="font-display text-2xl font-semibold text-forest-900 mb-6 flex items-center gap-2">
-                      <span className="w-8 h-[2px] bg-forest-300" />
-                      The Experience
-                    </h2>
-                    <p className="text-forest-700 leading-relaxed text-xl md:text-2xl font-light italic font-display border-l-4 border-forest-400 pl-6 py-2">
-                      {visit.experience_notes}
-                    </p>
-                  </div>
+                <div className="bg-white rounded-3xl p-8 shadow-card border border-forest-100/60">
+                  <h2 className="font-display text-2xl font-semibold text-forest-900 mb-4">The Experience</h2>
+                  <p className="text-forest-700 leading-loose text-xl font-light italic font-display">&ldquo;{visit.experience_notes}&rdquo;</p>
                 </div>
               </FadeIn>
             )}
@@ -110,17 +158,30 @@ export default async function RestaurantPage({ params }: { params: { id: string 
               </FadeIn>
             )}
 
-            {visit.photos && visit.photos.length > 1 && (
+            {photosWithLocal.length > 1 && (
               <FadeIn delay={0.3}>
                 <div>
                   <h2 className="font-display text-3xl font-semibold text-forest-900 mb-6">Photos</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {visit.photos.map((photo: any, i: number) => (
-                      <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
-                        <Image src={photo.image_url} alt={photo.caption || `Photo ${i + 1}`} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover hover:scale-105 transition-transform duration-500" sizes="300px" />
-                        <img src={photo.image_url} alt={photo.caption || `Photo ${i + 1}`} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
-                      </div>
-                    ))}
+                    {photosWithLocal.map((photo: any, i: number) => {
+                      const imgSrc = photo.localUrl || photo.image_url;
+                      return (
+                        <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
+                          {imgSrc ? (
+                            <>
+                              <Image src={imgSrc} alt={photo.caption || `Photo ${i + 1}`} fill unoptimized={true} className="object-cover hover:scale-105 transition-transform duration-500" onError={(e) => { console.error('Photo failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} />
+                              <div className="hidden w-full h-full bg-forest-100 flex items-center justify-center">
+                                <span className="text-2xl">🖼️</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="w-full h-full bg-forest-100 flex items-center justify-center">
+                              <span className="text-2xl">🖼️</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </FadeIn>
@@ -176,7 +237,6 @@ export default async function RestaurantPage({ params }: { params: { id: string 
           </div>
         </div>
       </div>
-      <CopyButton />
     </div>
   );
 }
