@@ -7,6 +7,27 @@ import { DishCard } from "@/components/restaurant/DishCard";
 import { FadeIn } from "@/components/animations/PageTransition";
 import { formatDate, getCuisineEmoji, occasionLabel, occasionEmoji, priceRangeLabel, recommendationLabel, recommendationColor, cn } from "@/lib/utils";
 import { DeleteVisitButton } from "@/components/admin/DeleteVisitButton";
+import fs from "fs";
+import path from "path";
+
+const LOCAL_IMAGE_MAP: Record<string, string> = {
+  "1441 Pizzeria": "/images/1441-pizzeria",
+  "1441": "/images/1441-pizzeria",
+};
+
+function getLocalImages(restaurantName: string): string[] {
+  const folderName = LOCAL_IMAGE_MAP[restaurantName];
+  if (!folderName) return [];
+  
+  const publicDir = path.join(process.cwd(), 'public');
+  const fullPath = path.join(publicDir, folderName);
+  
+  if (!fs.existsSync(fullPath)) return [];
+  
+  return fs.readdirSync(fullPath)
+    .filter(f => /\.(jpg|jpeg|png)$/i.test(f))
+    .map(f => `${folderName}/${f}`);
+}
 
 export default async function RestaurantPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -16,24 +37,35 @@ export default async function RestaurantPage({ params }: { params: { id: string 
   const { data: { user } } = await supabase.auth.getUser();
   const isAdmin = !!user;
   const sortedDishes = visit.dishes ? [...visit.dishes].sort((a: any, b: any) => b.rating - a.rating) : [];
-  const coverPhoto = visit.photos?.find((p: any) => p.type === "food") || visit.photos?.[0];
+  
+  // Get local images for this restaurant
+  const localImages = getLocalImages(visit.restaurant_name);
+  
+  // Map photos to local images if available
+  const photosWithLocal = visit.photos?.map((photo: any, idx: number) => ({
+    ...photo,
+    localUrl: localImages[idx] || null
+  })) || [];
+  
+  const coverPhoto = photosWithLocal.find((p: any) => p.type === "food") || photosWithLocal[0];
+  const displayImageUrl = coverPhoto?.localUrl || coverPhoto?.image_url;
 
   return (
     <div className="min-h-screen pt-20">
       <div className="relative h-72 md:h-96 overflow-hidden">
-        {coverPhoto ? (
+        {displayImageUrl ? (
           <img 
-            src={coverPhoto.image_url} 
+            src={displayImageUrl} 
             alt={visit.restaurant_name} 
             className="w-full h-full object-cover"
             onError={(e) => {
-              console.error('Image load failed:', coverPhoto.image_url);
+              console.error('Image load failed:', displayImageUrl);
               (e.target as HTMLImageElement).style.display = 'none';
               (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
             }}
           />
         ) : null}
-        <div className={`${coverPhoto ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center`}>
+        <div className={`${displayImageUrl ? 'hidden' : ''} w-full h-full bg-gradient-to-br from-forest-200 to-forest-400 flex items-center justify-center`}>
           <span className="text-[120px] opacity-40">{getCuisineEmoji(visit.cuisine)}</span>
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -105,36 +137,39 @@ export default async function RestaurantPage({ params }: { params: { id: string 
               </FadeIn>
             )}
 
-            {visit.photos && visit.photos.length > 1 && (
+            {photosWithLocal.length > 1 && (
               <FadeIn delay={0.3}>
                 <div>
                   <h2 className="font-display text-3xl font-semibold text-forest-900 mb-6">Photos</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {visit.photos.map((photo: any, i: number) => (
-                      <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
-                        {photo.image_url ? (
-                          <>
-                            <img 
-                              src={photo.image_url} 
-                              alt={photo.caption || `Photo ${i + 1}`} 
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                              onError={(e) => {
-                                console.error('Image load failed:', photo.image_url);
-                                (e.target as HTMLImageElement).style.display = 'none';
-                                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
-                              }}
-                            />
-                            <div className="hidden w-full h-full bg-forest-100 flex items-center justify-center">
+                    {photosWithLocal.map((photo: any, i: number) => {
+                      const imgSrc = photo.localUrl || photo.image_url;
+                      return (
+                        <div key={photo.id} className={cn("relative rounded-2xl overflow-hidden", i === 0 ? "col-span-2 h-64" : "h-32")}>
+                          {imgSrc ? (
+                            <>
+                              <img 
+                                src={imgSrc} 
+                                alt={photo.caption || `Photo ${i + 1}`} 
+                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                                onError={(e) => {
+                                  console.error('Image load failed:', imgSrc);
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                              <div className="hidden w-full h-full bg-forest-100 flex items-center justify-center">
+                                <span className="text-2xl">🖼️</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="w-full h-full bg-forest-100 flex items-center justify-center">
                               <span className="text-2xl">🖼️</span>
                             </div>
-                          </>
-                        ) : (
-                          <div className="w-full h-full bg-forest-100 flex items-center justify-center">
-                            <span className="text-2xl">🖼️</span>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </FadeIn>

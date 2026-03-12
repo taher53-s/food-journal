@@ -7,9 +7,53 @@ import { RestaurantVisit } from "@/types";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { cn, formatDateShort, getCuisineEmoji, occasionEmoji, priceRangeLabel, recommendationLabel, recommendationColor } from "@/lib/utils";
 
+const LOCAL_IMAGE_MAP: Record<string, string[]> = {
+  "1441 Pizzeria": [
+    "/images/1441-pizzeria/IMG_5638.jpg",
+    "/images/1441-pizzeria/IMG_5641.jpg",
+    "/images/1441-pizzeria/IMG_5642.jpg",
+    "/images/1441-pizzeria/IMG_5643.jpg",
+    "/images/1441-pizzeria/IMG_5645.jpg",
+    "/images/1441-pizzeria/IMG_5647.jpg",
+    "/images/1441-pizzeria/IMG_5648.jpg",
+    "/images/1441-pizzeria/IMG_5649.jpg",
+    "/images/1441-pizzeria/IMG_5651.jpg",
+    "/images/1441-pizzeria/IMG_5656.jpg",
+    "/images/1441-pizzeria/IMG_5658.jpg",
+    "/images/1441-pizzeria/IMG_5662.jpg",
+    "/images/1441-pizzeria/IMG_5663.jpg",
+    "/images/1441-pizzeria/IMG_5664.jpg",
+    "/images/1441-pizzeria/IMG_5666.jpg",
+    "/images/1441-pizzeria/IMG_5668.JPEG",
+  ],
+  "1441": [
+    "/images/1441-pizzeria/IMG_5638.jpg",
+    "/images/1441-pizzeria/IMG_5641.jpg",
+    "/images/1441-pizzeria/IMG_5642.jpg",
+    "/images/1441-pizzeria/IMG_5643.jpg",
+    "/images/1441-pizzeria/IMG_5645.jpg",
+    "/images/1441-pizzeria/IMG_5647.jpg",
+    "/images/1441-pizzeria/IMG_5648.jpg",
+    "/images/1441-pizzeria/IMG_5649.jpg",
+    "/images/1441-pizzeria/IMG_5651.jpg",
+    "/images/1441-pizzeria/IMG_5656.jpg",
+    "/images/1441-pizzeria/IMG_5658.jpg",
+    "/images/1441-pizzeria/IMG_5662.jpg",
+    "/images/1441-pizzeria/IMG_5663.jpg",
+    "/images/1441-pizzeria/IMG_5664.jpg",
+    "/images/1441-pizzeria/IMG_5666.jpg",
+    "/images/1441-pizzeria/IMG_5668.JPEG",
+  ],
+};
+
 export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; index?: number }) {
   const coverPhoto = visit.photos?.find((p) => p.type === "food") || visit.photos?.[0];
   const topDish = visit.dishes?.sort((a, b) => b.rating - a.rating)[0];
+  
+  // Get local image if available
+  const localImages = LOCAL_IMAGE_MAP[visit.restaurant_name] || [];
+  const localImage = localImages[index % localImages.length] || null;
+  const displayImage = localImage || coverPhoto?.image_url;
 
   return (
     <motion.div
@@ -24,10 +68,10 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
     >
       <Link href={`/restaurants/${visit.id}`} className="block">
         <div className="relative h-64 overflow-hidden">
-          {coverPhoto ? (
+          {displayImage ? (
             <>
-              <Image src={coverPhoto.image_url} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error("Image failed:", e.currentTarget.src); e.currentTarget.style.display = "none"; }} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
-              <img src={coverPhoto.image_url} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" style={{ zIndex: -1 }} onError={(e) => console.error("Fallback img failed:", coverPhoto.image_url)} />
+              <Image src={displayImage} alt={visit.restaurant_name} fill unoptimized={true} onError={(e) => { console.error("Image failed:", e.currentTarget.src); e.currentTarget.style.display = "none"; }} className="object-cover transition-transform duration-700 group-hover:scale-110" sizes="(max-width:768px) 100vw, 50vw" />
+              <img src={displayImage} alt={visit.restaurant_name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" style={{ zIndex: -1 }} onError={(e) => console.error("Fallback img failed:", displayImage)} />
             </>
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-forest-100 to-forest-200 flex items-center justify-center">
