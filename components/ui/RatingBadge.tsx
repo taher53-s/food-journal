@@ -24,7 +24,7 @@ export function RatingBadge({ rating, size = "md", animated = true, label, class
   if (!animated) {
     return (
       <div className={cn("flex flex-col items-center gap-1", className)}>
-        <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold", sizeClasses[size], colorClass)}>
+        <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold shadow-sm", sizeClasses[size], colorClass)}>
           {display}
         </div>
         {label && <span className="text-[10px] font-medium text-forest-500 uppercase tracking-widest">{label}</span>}
@@ -34,13 +34,14 @@ export function RatingBadge({ rating, size = "md", animated = true, label, class
 
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-      whileHover={{ scale: 1.1 }}
+      initial={{ scale: 0, opacity: 0, rotate: -8 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.05 }}
+      whileHover={{ scale: 1.12, rotate: [0, -3, 3, 0] }}
+      whileTap={{ scale: 0.92 }}
       className={cn("flex flex-col items-center gap-1", className)}
     >
-      <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold", sizeClasses[size], colorClass)}>
+      <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold shadow-sm", sizeClasses[size], colorClass)}>
         {display}
       </div>
       {label && <span className="text-[10px] font-medium text-forest-500 uppercase tracking-widest">{label}</span>}

@@ -19,9 +19,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 function StatCard({ icon, label, value, sub }: { icon: string; label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card text-center">
-      <div className="text-3xl mb-2">{icon}</div>
-      <div className="font-display text-4xl font-semibold text-forest-900 mb-1">{value}</div>
+    <div className="card-glass rounded-3xl p-5 text-center group">
+      <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-300">{icon}</div>
+      <div className="font-display text-3xl md:text-4xl font-semibold text-forest-900 mb-1">{value}</div>
       <div className="text-xs font-semibold text-forest-500 uppercase tracking-wider">{label}</div>
       {sub && <div className="text-xs text-forest-400 mt-1">{sub}</div>}
     </div>
@@ -51,10 +51,10 @@ export function AnalyticsDashboard({ data }: { data: any }) {
         </StaggerItem>
       </StaggerContainer>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <FadeIn delay={0.1}>
-          <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card">
-            <h3 className="font-display text-xl font-semibold text-forest-900 mb-6">Favourite Cuisines</h3>
+          <div className="card-premium rounded-3xl p-6">
+            <h3 className="font-display text-xl font-semibold text-forest-900 mb-5">Favourite Cuisines</h3>
             {cuisinesWithEmoji.length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={cuisinesWithEmoji} layout="vertical" margin={{ left: 8, right: 16 }}>
@@ -71,8 +71,8 @@ export function AnalyticsDashboard({ data }: { data: any }) {
         </FadeIn>
 
         <FadeIn delay={0.15}>
-          <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card">
-            <h3 className="font-display text-xl font-semibold text-forest-900 mb-6">Price Distribution</h3>
+          <div className="card-premium rounded-3xl p-6">
+            <h3 className="font-display text-xl font-semibold text-forest-900 mb-5">Price Distribution</h3>
             {(data.priceDistribution || []).length > 0 ? (
               <ResponsiveContainer width="100%" height={240}>
                 <PieChart>
@@ -88,8 +88,8 @@ export function AnalyticsDashboard({ data }: { data: any }) {
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card">
-            <h3 className="font-display text-xl font-semibold text-forest-900 mb-6">Monthly Visits</h3>
+          <div className="card-premium rounded-3xl p-6">
+            <h3 className="font-display text-xl font-semibold text-forest-900 mb-5">Monthly Visits</h3>
             {(data.monthlyVisits || []).length > 0 ? (
               <ResponsiveContainer width="100%" height={220}>
                 <LineChart data={data.monthlyVisits}>
@@ -105,8 +105,8 @@ export function AnalyticsDashboard({ data }: { data: any }) {
         </FadeIn>
 
         <FadeIn delay={0.25}>
-          <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card">
-            <h3 className="font-display text-xl font-semibold text-forest-900 mb-6">Dining Occasions</h3>
+          <div className="card-premium rounded-3xl p-6">
+            <h3 className="font-display text-xl font-semibold text-forest-900 mb-5">Dining Occasions</h3>
             {occasionData.length > 0 ? (
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={occasionData}>
@@ -125,15 +125,15 @@ export function AnalyticsDashboard({ data }: { data: any }) {
 
       {(data.topRatedRestaurants || []).length > 0 && (
         <FadeIn delay={0.3}>
-          <div className="bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card">
-            <h3 className="font-display text-xl font-semibold text-forest-900 mb-6">Top Rated Restaurants</h3>
-            <div className="space-y-3">
+          <div className="card-premium rounded-3xl p-6">
+            <h3 className="font-display text-xl font-semibold text-forest-900 mb-5">Top Rated Restaurants</h3>
+            <div className="space-y-2">
               {(data.topRatedRestaurants || []).map((r: any, i: number) => (
-                <div key={i} className="flex items-center gap-4 p-3 rounded-2xl hover:bg-forest-50 transition-colors">
-                  <span className="text-xl w-8 text-center">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`}</span>
-                  <span className="text-2xl">{getCuisineEmoji(r.cuisine)}</span>
+                <div key={i} className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-forest-50 transition-all duration-200 active:scale-[0.99]">
+                  <span className="text-xl w-8 text-center transition-transform duration-200 group-hover:scale-110">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}.`}</span>
+                  <span className="text-2xl transition-transform duration-200 group-hover:scale-110">{getCuisineEmoji(r.cuisine)}</span>
                   <div className="flex-1">
-                    <p className="font-semibold text-forest-900 text-sm">{r.name}</p>
+                    <p className="font-semibold text-forest-900 text-sm group-hover:text-forest-700 transition-colors">{r.name}</p>
                     <p className="text-xs text-forest-500">{r.cuisine}</p>
                   </div>
                   <span className="font-display text-xl font-semibold text-forest-700">{r.rating}</span>

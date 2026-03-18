@@ -129,7 +129,6 @@ export function VisitForm({ initialData, visitId }: { initialData?: any; visitId
             if (!publicUrl) {
               throw new Error("Failed to receive public URL for the uploaded image.");
             }
-            console.log("Uploaded image publicUrl:", publicUrl);
             image_url = publicUrl;
           } else if (upErr) {
             throw upErr;

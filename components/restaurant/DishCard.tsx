@@ -1,9 +1,9 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { Dish } from "@/types";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { FlavorTag } from "@/components/ui/FlavorTag";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -31,12 +31,18 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
+      whileHover={{ y: -4 }}
       transition={{ duration: 0.4, delay: index * 0.06 }}
       className={cn(
-        "group relative bg-white rounded-3xl overflow-hidden border transition-all duration-300",
-        isTopThree ? cn("border", rankColors[rank]) : "border-forest-100/60",
-        "shadow-card hover:shadow-card-hover hover:-translate-y-1"
+        "group relative bg-white rounded-3xl overflow-hidden transition-all duration-300",
+        isTopThree
+          ? "border-2 border-transparent shadow-card"
+          : "border border-forest-100/60 shadow-card"
       )}
+      style={isTopThree ? {
+        borderImage: "linear-gradient(135deg, rgba(245,158,11,0.4), rgba(245,158,11,0.1), rgba(27,94,67,0.2)) 1",
+        borderImageSlice: 1,
+      } : {}}
     >
       {isTopThree && (
         <motion.div
@@ -55,23 +61,20 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
         </button>
       )}
       <div className="relative h-44 overflow-hidden">
-        {dish.image_url ? (
-          <>
-            <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error("Image failed:", e.currentTarget.src); e.currentTarget.style.display = "none"; }} className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="300px" />
-            <img src={dish.image_url} alt={dish.dish_name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" style={{ zIndex: -1 }} onError={(e) => console.error("Fallback img failed:", dish.image_url)} />
-          </>
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-forest-50 to-cream-200 flex items-center justify-center">
-            <span className="text-5xl">🍽️</span>
-          </div>
-        )}
+        <OptimizedImage
+          src={dish.image_url}
+          alt={dish.dish_name}
+          className="transition-transform duration-500 group-hover:scale-105"
+          sizes="300px"
+          fallbackEmoji="🍽️"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         <div className="absolute bottom-3 right-3">
           <RatingBadge rating={dish.rating} size="sm" animated={false} />
         </div>
       </div>
       <div className="p-4">
-        <h4 className="font-display text-lg font-semibold text-forest-900 leading-tight mb-1">{dish.dish_name}</h4>
+        <h4 className="font-display text-lg font-semibold text-forest-900 leading-tight mb-1 group-hover:text-forest-700 transition-colors duration-200">{dish.dish_name}</h4>
         {dish.price && <p className="text-xs text-forest-400 font-medium mb-2">₹{dish.price.toLocaleString("en-IN")}</p>}
         {dish.notes && <p className="text-xs text-forest-600 leading-relaxed mb-3 line-clamp-2 italic">{dish.notes}</p>}
         {dish.flavor_tags && dish.flavor_tags.length > 0 && (

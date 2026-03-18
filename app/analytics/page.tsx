@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { FadeIn } from "@/components/animations/PageTransition";
+import { FadeIn, AnimatedDivider, SectionHeading } from "@/components/animations/PageTransition";
 import { AnalyticsDashboard } from "@/components/analytics/AnalyticsDashboard";
 
 export const metadata = { title: "Analytics" };
@@ -10,13 +10,17 @@ export default async function AnalyticsPage() {
   const all = visits || [];
 
   const totalRestaurants = all.length;
-  const averageRating = all.length ? Math.round((all.reduce((a: number, v: any) => a + v.overall_rating, 0) / all.length) * 10) / 10 : 0;
+  const averageRating = all.length
+    ? Math.round((all.reduce((a: number, v: any) => a + v.overall_rating, 0) / all.length) * 10) / 10
+    : 0;
 
   const cuisineCounts: Record<string, number> = {};
   all.forEach((v: any) => { cuisineCounts[v.cuisine] = (cuisineCounts[v.cuisine] || 0) + 1; });
   const favoriteCuisines = Object.entries(cuisineCounts).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([cuisine, count]) => ({ cuisine, count }));
 
-  const topRatedRestaurants = [...all].sort((a: any, b: any) => b.overall_rating - a.overall_rating).slice(0, 5).map((v: any) => ({ name: v.restaurant_name, rating: v.overall_rating, cuisine: v.cuisine }));
+  const topRatedRestaurants = [...all].sort((a: any, b: any) => b.overall_rating - a.overall_rating).slice(0, 5).map((v: any) => ({
+    name: v.restaurant_name, rating: v.overall_rating, cuisine: v.cuisine,
+  }));
 
   const priceCounts: Record<string, number> = {};
   all.forEach((v: any) => { priceCounts[v.price_range] = (priceCounts[v.price_range] || 0) + 1; });
@@ -35,9 +39,7 @@ export default async function AnalyticsPage() {
     const dates = monthlyVisits.map(m => new Date(m.month + "-01"));
     streak = 1;
     for (let i = dates.length - 1; i > 0; i--) {
-      const current = dates[i];
-      const prev = dates[i - 1];
-      const diffMonths = (current.getFullYear() - prev.getFullYear()) * 12 + current.getMonth() - prev.getMonth();
+      const diffMonths = (dates[i].getFullYear() - dates[i - 1].getFullYear()) * 12 + dates[i].getMonth() - dates[i - 1].getMonth();
       if (diffMonths === 1) streak++;
       else break;
     }
@@ -49,14 +51,13 @@ export default async function AnalyticsPage() {
     <div className="min-h-screen pt-24 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         <FadeIn>
-          <div className="mb-12">
-            <p className="text-xs font-bold text-forest-500 uppercase tracking-widest mb-3">Data Insights</p>
-            <h1 className="font-display text-5xl md:text-6xl font-light text-forest-950 mb-4">
-              Food <span className="text-gradient italic">Analytics</span>
-            </h1>
-            <p className="text-forest-500 text-lg font-light">A deep dive into the patterns and preferences of this culinary journey.</p>
-          </div>
+          <SectionHeading
+            eyebrow="Data Insights"
+            title="Food Analytics"
+            subtitle="A deep dive into the patterns and preferences of this culinary journey."
+          />
         </FadeIn>
+        <AnimatedDivider className="mb-12" />
         <AnalyticsDashboard data={data} />
       </div>
     </div>

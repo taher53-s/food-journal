@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import Image from "next/image";
 import Link from "next/link";
-import { FadeIn, StaggerContainer, StaggerItem } from "@/components/animations/PageTransition";
+import { FadeIn, StaggerContainer, StaggerItem, SectionHeading, AnimatedDivider } from "@/components/animations/PageTransition";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { FlavorTag } from "@/components/ui/FlavorTag";
-import { cn } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { ConfettiBlast } from "@/components/ui/ConfettiBlast";
+import { HallOfFameTrophy, HallOfFameTopCard } from "./HallOfFameCards";
 
 export const metadata = { title: "Hall of Fame" };
 
@@ -20,21 +20,22 @@ export default async function HallOfFamePage() {
   const all = dishes || [];
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4 relative">
+    <div className="min-h-screen pt-24 pb-20 px-4 relative overflow-hidden">
       <ConfettiBlast />
       <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <FadeIn>
           <div className="text-center mb-16">
-            <div className="text-6xl mb-4 animate-float">🏆</div>
-            <p className="text-xs font-bold text-gold-600 uppercase tracking-widest mb-3">Rated 9 or above</p>
-            <h1 className="font-display text-5xl md:text-7xl font-light text-forest-950 mb-4">
-              Hall of <span className="text-gradient-gold italic">Fame</span>
-            </h1>
-            <p className="text-forest-500 text-lg max-w-xl mx-auto font-light">
-              The most exceptional dishes on this culinary journey. Perfection on a plate.
-            </p>
+            <HallOfFameTrophy />
+            <SectionHeading
+              eyebrow="Rated 9 or above"
+              title="Hall of Fame"
+              subtitle="The most exceptional dishes on this culinary journey. Perfection on a plate."
+              align="center"
+            />
           </div>
         </FadeIn>
+        <AnimatedDivider className="mb-14" />
 
         {all.length === 0 ? (
           <div className="text-center py-24">
@@ -43,56 +44,33 @@ export default async function HallOfFamePage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Top 3 — gold podium */}
+            <StaggerContainer staggerDelay={0.12} className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
               {all.slice(0, 3).map((dish: any, i: number) => (
-                <FadeIn key={dish.id} delay={i * 0.1}>
-                  <Link href={`/restaurants/${dish.visit_id}`}
-                    className="group relative block bg-white rounded-3xl overflow-hidden border border-forest-100/60 shadow-luxury hover:-translate-y-2 hover:shadow-glow-gold transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-gold-300/0 via-gold-200/0 to-gold-400/0 group-hover:via-gold-300/30 group-hover:to-gold-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20" />
-                    <div className="absolute top-4 left-4 z-10 text-3xl">{["🥇", "🥈", "🥉"][i]}</div>
-                    <div className="relative h-56 overflow-hidden">
-                      {dish.image_url ? (
-                        <>
-                          <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="400px" />
-                          <img src={dish.image_url} alt={dish.dish_name} className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: -1 }} />
-                        </>
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-gold-100 to-gold-200 flex items-center justify-center">
-                          <span className="text-6xl">🍽️</span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                      <div className="absolute bottom-4 right-4">
-                        <RatingBadge rating={dish.rating} size="md" animated={false} />
-                      </div>
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-display text-xl font-semibold text-forest-900 mb-1">{dish.dish_name}</h3>
-                      <p className="text-sm text-forest-500 mb-3">{dish.restaurant_visits?.restaurant_name} · {dish.restaurant_visits?.cuisine}</p>
-                      {dish.notes && <p className="text-xs text-forest-600 italic line-clamp-2 mb-3 font-display">&ldquo;{dish.notes}&rdquo;</p>}
-                      {dish.flavor_tags && dish.flavor_tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {dish.flavor_tags.slice(0, 3).map((tag: any) => <FlavorTag key={tag} tag={tag} size="sm" />)}
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                </FadeIn>
+                <StaggerItem key={dish.id}>
+                  <HallOfFameTopCard dish={dish} index={i} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
 
+            {/* Also Legendary */}
             {all.length > 3 && (
               <div>
-                <FadeIn><h2 className="font-display text-3xl font-light text-forest-900 mb-6">Also Legendary</h2></FadeIn>
-                <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <FadeIn>
+                  <SectionHeading title="Also Legendary" />
+                </FadeIn>
+                <AnimatedDivider className="mb-8" />
+                <StaggerContainer staggerDelay={0.07} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {all.slice(3).map((dish: any) => (
                     <StaggerItem key={dish.id}>
-                      <Link href={`/restaurants/${dish.visit_id}`}
-                        className="group flex items-center gap-4 bg-white rounded-2xl p-4 border border-forest-100/60 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300">
+                      <Link href={`/restaurants/${dish.visit_id}`} className="group flex items-center gap-4 bg-white rounded-2xl p-4 border border-forest-100/60 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 active:scale-[0.98]">
                         <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
-                          {dish.image_url
-                            ? <Image src={dish.image_url} alt={dish.dish_name} fill unoptimized={true} onError={(e) => { console.error('Image failed:', e.currentTarget.src); e.currentTarget.style.display = 'none'; }} className="object-cover" sizes="64px" />
-                            : <div className="w-full h-full bg-forest-100 flex items-center justify-center text-xl">🍽️</div>}
+                          <OptimizedImage
+                            src={dish.image_url}
+                            alt={dish.dish_name}
+                            sizes="64px"
+                            fallbackEmoji="🍽️"
+                          />
                         </div>
                         <div className="min-w-0">
                           <p className="font-semibold text-forest-900 text-sm truncate">{dish.dish_name}</p>
