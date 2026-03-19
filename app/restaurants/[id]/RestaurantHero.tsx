@@ -28,6 +28,9 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
 
   return (
     <div ref={ref} className="relative h-96 md:h-[520px] overflow-hidden">
+      {/* Dark fallback bg — shows if image fails */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0A1A12] via-[#0A2018] to-[#0A1A12]" />
+
       {/* Parallax image layer */}
       <motion.div style={{ y: imageY, scale }} className="absolute inset-0 z-10">
         <OptimizedImage
@@ -38,8 +41,8 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
         />
       </motion.div>
 
-      {/* Dark gradient overlay */}
-      <motion.div style={{ opacity: overlayOpacity }} className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/40" />
+      {/* Dark gradient overlay — stronger for readability */}
+      <motion.div style={{ opacity: overlayOpacity }} className="absolute inset-0 bg-gradient-to-t from-[#0A1A12] via-[#0A1A12]/70 to-[#0A1A12]/20" />
 
       {/* Back button */}
       <motion.div
@@ -50,7 +53,7 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
       >
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-black/60 transition-all shadow-lg shadow-black/20"
+          className="flex items-center gap-2 bg-[#0A1A12]/70 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-[#0A1A12]/90 transition-all shadow-lg shadow-black/30"
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
@@ -66,7 +69,7 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
         >
           <Link
             href={`/admin/edit/${visitId}`}
-            className="bg-white/15 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-white/25 transition-all"
+            className="bg-[#0A1A12]/70 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-[#0A1A12]/90 transition-all shadow-lg shadow-black/30"
           >
             Edit
           </Link>
@@ -93,6 +96,7 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className="font-display text-4xl md:text-6xl font-semibold text-white mb-2"
+            style={{ textShadow: "0 4px 24px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.5)" }}
           >
             {restaurantName}
           </motion.h1>

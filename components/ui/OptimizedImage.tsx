@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 interface OptimizedImageProps {
@@ -22,20 +21,27 @@ export function OptimizedImage({
   sizes,
   style,
 }: OptimizedImageProps) {
-  const [imgError, setImgError] = useState(false);
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
+  const [phase, setPhase] = useState<"loading" | "loaded" | "error">("loading");
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const handleImageError = () => {
-    setImgError(true);
-    setShowFallback(true);
-  };
+  useEffect(() => {
+    // Reset when src changes
+    setPhase("loading");
+    if (imgRef.current) {
+      imgRef.current.onload = null;
+      imgRef.current.onerror = null;
+      // Force re-evaluate
+      if (imgRef.current.complete) {
+        if (imgRef.current.naturalWidth > 0) {
+          setPhase("loaded");
+        } else {
+          setPhase("error");
+        }
+      }
+    }
+  }, [src]);
 
-  const handleFallbackError = () => {
-    setShowFallback(true);
-  };
-
-  if (!src || imgError) {
+  if (!src) {
     return (
       <div
         className={cn(
@@ -51,43 +57,35 @@ export function OptimizedImage({
 
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)} style={style}>
-      {/* Next.js Image — primary renderer */}
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        unoptimized={true}
-        priority={priority}
-        sizes={sizes}
-        onError={handleImageError}
-        onLoad={() => setImgLoaded(true)}
-        className={cn(
-          "object-cover transition-all duration-500",
-          !imgLoaded && "opacity-0",
-          imgLoaded && "opacity-100"
-        )}
-      />
-
-      {/* Fallback native img — shows when Next.js Image fails */}
-      {showFallback && !imgLoaded && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={src}
-          alt={alt}
-          className="absolute inset-0 w-full h-full object-cover"
-          onError={handleFallbackError}
-        />
-      )}
-
-      {/* Skeleton while loading */}
-      {!imgLoaded && !imgError && (
+      {/* Loading skeleton */}
+      {phase === "loading" && (
         <div className="absolute inset-0 bg-gradient-to-br from-forest-800/40 to-forest-900/20 animate-pulse" />
       )}
 
-      {/* Emoji placeholder overlay if both image and fallback fail */}
-      {showFallback && !imgLoaded && (
+      {/* Native img — works reliably on all devices/browsers */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        className={cn(
+          "w-full h-full object-cover transition-opacity duration-500",
+          phase === "loaded" ? "opacity-100" : "opacity-0"
+        )}
+        onLoad={(e) => {
+          const img = e.currentTarget;
+          if (img.naturalWidth > 0) setPhase("loaded");
+          else setPhase("error");
+        }}
+        onError={() => setPhase("error")}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+      />
+
+      {/* Error placeholder: gradient + emoji */}
+      {phase === "error" && (
         <div className="absolute inset-0 bg-gradient-to-br from-forest-800/60 to-forest-900/40 flex items-center justify-center">
-          <span className="text-4xl opacity-30">{fallbackEmoji}</span>
+          <span className="text-5xl opacity-30">{fallbackEmoji}</span>
         </div>
       )}
     </div>
