@@ -48,16 +48,23 @@ export default async function AnalyticsPage() {
   const data = { totalRestaurants, averageRating, favoriteCuisines, topRatedRestaurants, priceDistribution, occasionBreakdown, monthlyVisits, streak };
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0A1A12]">
+      {/* Ambient orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(27,94,67,0.07) 0%, transparent 70%)", filter: "blur(60px)" }} />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 pt-32 pb-24">
         <FadeIn>
           <SectionHeading
-            eyebrow="Data Insights"
+            eyebrow="★ Data Insights"
             title="Food Analytics"
             subtitle="A deep dive into the patterns and preferences of this culinary journey."
+            dark
           />
         </FadeIn>
-        <AnimatedDivider className="mb-12" />
+        <AnimatedDivider className="mb-12" dark />
         <AnalyticsDashboard data={data} />
       </div>
     </div>

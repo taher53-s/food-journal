@@ -110,14 +110,15 @@ export function StaggerItem({ children, className, direction = "up" }: { childre
 }
 
 /** Animated horizontal line that draws itself */
-export function AnimatedDivider({ className, delay = 0 }: { className?: string; delay?: number }) {
+export function AnimatedDivider({ className, delay = 0, dark = false }: { className?: string; delay?: number; dark?: boolean }) {
+  const gradientClass = dark ? "from-transparent via-white/10 to-transparent" : "from-transparent via-forest-300 to-transparent";
   return (
     <motion.div
       initial={{ scaleX: 0 }}
       whileInView={{ scaleX: 1 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 1.2, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={`h-px bg-gradient-to-r from-transparent via-forest-300 to-transparent ${className || ""}`}
+      className={`h-px bg-gradient-to-r ${gradientClass} ${className || ""}`}
     />
   );
 }
@@ -141,12 +142,17 @@ export function SectionHeading({
   title,
   subtitle,
   align = "left",
+  dark = false,
 }: {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   align?: "left" | "center";
+  dark?: boolean;
 }) {
+  const eyebrowClass = dark ? "text-gold-500" : "text-forest-500";
+  const titleClass = dark ? "text-white" : "text-forest-950";
+  const subtitleClass = dark ? "text-white/40" : "text-forest-500";
   return (
     <div className={`mb-12 ${align === "center" ? "text-center" : ""}`}>
       {eyebrow && (
@@ -155,7 +161,7 @@ export function SectionHeading({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="text-xs font-bold text-forest-500 uppercase tracking-[0.2em] mb-3"
+          className={`text-xs font-bold ${eyebrowClass} uppercase tracking-[0.2em] mb-3`}
         >
           {eyebrow}
         </motion.p>
@@ -165,7 +171,7 @@ export function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-        className="font-display text-4xl md:text-5xl font-light text-forest-950 mb-3"
+        className={`font-display text-4xl md:text-5xl font-light ${titleClass} mb-3`}
       >
         {title}
       </motion.h2>
@@ -175,7 +181,7 @@ export function SectionHeading({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="text-forest-500 text-base max-w-xl font-light"
+          className={`${subtitleClass} text-base max-w-xl font-light`}
         >
           {subtitle}
         </motion.p>

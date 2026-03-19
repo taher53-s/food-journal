@@ -19,7 +19,7 @@
   }
 
   body {
-    background-color: #FAF7F0;
+    background-color: #0A1A12;
     color: #0D0D0B;
     font-family: var(--font-jakarta);
     min-height: 100vh;
@@ -31,7 +31,7 @@
   }
 
   ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: #FAF7F0; }
+  ::-webkit-scrollbar-track { background: #0A1A12; }
   ::-webkit-scrollbar-thumb {
     background: #C8DDD0;
     border-radius: 10px;
@@ -170,10 +170,10 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-  /* Subtle warm body gradient */
+  /* Subtle dark body gradient */
   .bg-warm {
-    background: radial-gradient(ellipse 100% 60% at 50% 0%, rgba(212, 175, 135, 0.06) 0%, transparent 60%),
-                #FAF7F0;
+    background: radial-gradient(ellipse 100% 60% at 50% 0%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
+                #0A1A12;
   }
 
   /* Glassmorphism utility */

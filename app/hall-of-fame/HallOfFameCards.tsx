@@ -62,21 +62,21 @@ export function HallOfFameTopCard({ dish, index }: TopCardProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute bottom-4 right-4">
-            <RatingBadge rating={dish.rating} size="md" animated />
+            <RatingBadge rating={dish.rating} size="md" animated dark />
           </div>
         </div>
 
         {/* Content */}
         <div className="p-5">
-          <h3 className="font-display text-xl font-semibold text-forest-900 mb-1">{dish.dish_name}</h3>
-          <p className="text-sm text-forest-500 mb-3">{dish.restaurant_visits?.restaurant_name} · {dish.restaurant_visits?.cuisine}</p>
+          <h3 className="font-display text-xl font-semibold text-white mb-1">{dish.dish_name}</h3>
+          <p className="text-sm text-white/50 mb-3">{dish.restaurant_visits?.restaurant_name} · {dish.restaurant_visits?.cuisine}</p>
           {dish.notes && (
-            <p className="text-xs text-forest-600 italic line-clamp-2 mb-3 font-display">&ldquo;{dish.notes}&rdquo;</p>
+            <p className="text-xs text-white/40 italic line-clamp-2 mb-3 font-display">&ldquo;{dish.notes}&rdquo;</p>
           )}
           {dish.flavor_tags && dish.flavor_tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {dish.flavor_tags.slice(0, 3).map((tag: any) => (
-                <FlavorTag key={tag} tag={tag} size="sm" />
+                <FlavorTag key={tag} tag={tag} size="sm" dark />
               ))}
             </div>
           )}

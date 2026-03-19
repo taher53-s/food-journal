@@ -77,7 +77,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
       </div>
 
       {/* Content */}
-      <div className="max-w-5xl mx-auto px-4 py-12 bg-[#FAF7F0]">
+      <div className="max-w-5xl mx-auto px-4 py-12 bg-[#0A1A12]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main column */}
           <div className="lg:col-span-2 space-y-10">
@@ -85,9 +85,9 @@ export default async function RestaurantPage({ params }: { params: { id: string 
             {/* Experience notes */}
             {visit.experience_notes && (
               <FadeIn>
-                <div className="bg-white rounded-3xl p-8 shadow-card border border-forest-100/60">
+                <div className="bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-3xl p-8">
                   <SectionHeading title="The Experience" />
-                  <p className="text-forest-700 leading-loose text-xl font-light italic font-display">
+                  <p className="text-white/60 leading-loose text-xl font-light italic font-display">
                     &ldquo;{visit.experience_notes}&rdquo;
                   </p>
                 </div>
@@ -96,16 +96,16 @@ export default async function RestaurantPage({ params }: { params: { id: string 
 
             {/* Ratings breakdown */}
             <FadeIn delay={0.05}>
-              <div className="bg-white rounded-3xl p-8 shadow-card border border-forest-100/60">
+              <div className="bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-3xl p-8">
                 <SectionHeading title="Ratings Breakdown" />
                 <div className="space-y-4">
-                  <RatingBar label="Food" rating={visit.food_rating} delay={0.1} />
-                  <RatingBar label="Service" rating={visit.service_rating} delay={0.18} />
-                  <RatingBar label="Ambience" rating={visit.ambience_rating} delay={0.26} />
-                  <RatingBar label="Value" rating={visit.value_rating} delay={0.34} />
+                  <RatingBar label="Food" rating={visit.food_rating} delay={0.1} dark />
+                  <RatingBar label="Service" rating={visit.service_rating} delay={0.18} dark />
+                  <RatingBar label="Ambience" rating={visit.ambience_rating} delay={0.26} dark />
+                  <RatingBar label="Value" rating={visit.value_rating} delay={0.34} dark />
                 </div>
-                <div className="mt-6 pt-6 border-t border-forest-100 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-forest-700 uppercase tracking-wider">Overall</span>
+                <div className="mt-6 pt-6 border-t border-white/[0.06] flex items-center justify-between">
+                  <span className="text-sm font-semibold text-white/60 uppercase tracking-wider">Overall</span>
                   <RatingBadge rating={visit.overall_rating} size="lg" label="/ 10" />
                 </div>
               </div>
@@ -119,7 +119,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                 <StaggerContainer staggerDelay={0.1} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {sortedDishes.map((dish: any, i: number) => (
                     <StaggerItem key={dish.id}>
-                      <DishCard dish={dish} rank={i < 3 ? i : undefined} isAdmin={isAdmin} index={i} />
+                      <DishCard dish={dish} rank={i < 3 ? i : undefined} isAdmin={isAdmin} index={i} dark />
                     </StaggerItem>
                   ))}
                 </StaggerContainer>
@@ -154,32 +154,32 @@ export default async function RestaurantPage({ params }: { params: { id: string 
           {/* Sidebar */}
           <div className="space-y-4">
             <FadeIn delay={0.1}>
-              <div className="bg-white rounded-3xl p-6 shadow-card border border-forest-100/60 space-y-4 sticky top-24">
+              <div className="bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-3xl p-6 space-y-4 sticky top-24">
                 <SectionHeading title="Details" />
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-forest-500">Price Range</span>
-                    <span className="font-medium text-forest-800">{priceRangeLabel[visit.price_range as keyof typeof priceRangeLabel]}</span>
+                    <span className="text-white/40">Price Range</span>
+                    <span className="font-medium text-white/70">{priceRangeLabel[visit.price_range as keyof typeof priceRangeLabel]}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-forest-500">Occasion</span>
-                    <span className="font-medium text-forest-800">{occasionEmoji[visit.occasion as keyof typeof occasionEmoji]} {occasionLabel[visit.occasion as keyof typeof occasionEmoji]}</span>
+                    <span className="text-white/40">Occasion</span>
+                    <span className="font-medium text-white/70">{occasionEmoji[visit.occasion as keyof typeof occasionEmoji]} {occasionLabel[visit.occasion as keyof typeof occasionEmoji]}</span>
                   </div>
                   {visit.companions && (
                     <div className="flex items-center justify-between">
-                      <span className="text-forest-500">With</span>
-                      <span className="font-medium text-forest-800 text-right max-w-[160px]">{visit.companions}</span>
+                      <span className="text-white/40">With</span>
+                      <span className="font-medium text-white/70 text-right max-w-[160px]">{visit.companions}</span>
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-forest-500">Would Return</span>
+                    <span className="text-white/40">Would Return</span>
                     {visit.would_return
-                      ? <CheckCircle className="w-4 h-4 text-forest-500" />
+                      ? <CheckCircle className="w-4 h-4 text-white/40" />
                       : <XCircle className="w-4 h-4 text-red-400" />}
                   </div>
                 </div>
-                <div className="pt-4 border-t border-forest-100 text-center">
-                  <RatingBadge rating={visit.overall_rating} size="xl" label="Overall Rating" />
+                <div className="pt-4 border-t border-white/[0.06] text-center">
+                  <RatingBadge rating={visit.overall_rating} size="xl" label="Overall Rating" dark />
                 </div>
               </div>
             </FadeIn>
@@ -187,7 +187,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
             {/* Dish rankings sidebar */}
             {sortedDishes.length > 0 && (
               <FadeIn delay={0.15}>
-                <div className="bg-white rounded-3xl p-6 shadow-card border border-forest-100/60">
+                <div className="bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-3xl p-6">
                   <SectionHeading title="Dish Rankings" />
                   <div className="space-y-2">
                     {sortedDishes.map((dish: any, i: number) => (
@@ -197,6 +197,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                         name={dish.dish_name}
                         rating={dish.rating}
                         index={i}
+                        dark
                       />
                     ))}
                   </div>

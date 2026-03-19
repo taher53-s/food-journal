@@ -76,8 +76,8 @@ function HorizontalPhotoStrip({ photos }: { photos: Photo[] }) {
   const duplicated = [...photos, ...photos, ...photos];
   return (
     <div className="relative w-full overflow-hidden">
-      <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#FAF7F0] to-transparent z-10 pointer-events-none" />
-      <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#FAF7F0] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0A1A12] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0A1A12] to-transparent z-10 pointer-events-none" />
       <motion.div
         className="flex gap-3 py-3"
         animate={{ x: ["0%", "-33.33%"] }}
@@ -127,7 +127,7 @@ export function GalleryClient({ photos }: GalleryClientProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-[10px] uppercase tracking-[0.3em] text-forest-400 font-semibold mb-3 ml-1"
+            className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-semibold mb-3 ml-1"
           >
             Scroll to explore
           </motion.p>
@@ -151,9 +151,12 @@ export function GalleryClient({ photos }: GalleryClientProps) {
           </div>
         </>
       ) : (
-        <div className="text-center py-24">
-          <div className="text-6xl mb-4">📸</div>
-          <p className="text-forest-500">No photos yet. Start adding restaurant visits with photos!</p>
+        <div className="relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-transparent border border-white/[0.06] rounded-4xl p-16 max-w-lg mx-auto text-center">
+          <div className="relative z-10">
+            <div className="text-6xl mb-4">📸</div>
+            <h3 className="font-display text-2xl text-white/80 mb-2">No photos yet</h3>
+            <p className="text-white/30 mb-6">Start adding restaurant visits with photos!</p>
+          </div>
         </div>
       )}
 

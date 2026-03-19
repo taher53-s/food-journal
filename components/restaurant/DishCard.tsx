@@ -16,9 +16,13 @@ const rankColors = [
   "bg-gradient-to-br from-ember-100 to-ember-50 border-ember-200",
 ];
 
-export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?: number; isAdmin?: boolean; index?: number }) {
+export function DishCard({ dish, rank, isAdmin, index = 0, dark = false }: { dish: Dish; rank?: number; isAdmin?: boolean; index?: number; dark?: boolean }) {
   const router = useRouter();
   const isTopThree = rank !== undefined && rank < 3;
+  const cardBg = dark ? "bg-white/[0.04] backdrop-blur-md border border-white/[0.08]" : "bg-white border border-forest-100/60";
+  const textTitle = dark ? "text-white/90" : "text-forest-900";
+  const textPrice = dark ? "text-white/40" : "text-forest-400";
+  const textNotes = dark ? "text-white/50" : "text-forest-600";
 
   const handleDelete = async () => {
     if (!confirm("Delete this dish?")) return;
@@ -34,10 +38,9 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
       whileHover={{ y: -4 }}
       transition={{ duration: 0.4, delay: index * 0.06 }}
       className={cn(
-        "group relative bg-white rounded-3xl overflow-hidden transition-all duration-300",
-        isTopThree
-          ? "border-2 border-transparent shadow-card"
-          : "border border-forest-100/60 shadow-card"
+        "group relative rounded-3xl overflow-hidden transition-all duration-300",
+        cardBg,
+        isTopThree ? "shadow-card" : "shadow-card"
       )}
       style={isTopThree ? {
         borderImage: "linear-gradient(135deg, rgba(245,158,11,0.4), rgba(245,158,11,0.1), rgba(27,94,67,0.2)) 1",
@@ -74,12 +77,12 @@ export function DishCard({ dish, rank, isAdmin, index = 0 }: { dish: Dish; rank?
         </div>
       </div>
       <div className="p-4">
-        <h4 className="font-display text-lg font-semibold text-forest-900 leading-tight mb-1 group-hover:text-forest-700 transition-colors duration-200">{dish.dish_name}</h4>
-        {dish.price && <p className="text-xs text-forest-400 font-medium mb-2">₹{dish.price.toLocaleString("en-IN")}</p>}
-        {dish.notes && <p className="text-xs text-forest-600 leading-relaxed mb-3 line-clamp-2 italic">{dish.notes}</p>}
+        <h4 className={cn("font-display text-lg font-semibold leading-tight mb-1 group-hover:opacity-80 transition-colors duration-200", textTitle)}>{dish.dish_name}</h4>
+        {dish.price && <p className={cn("text-xs font-medium mb-2", textPrice)}>₹{dish.price.toLocaleString("en-IN")}</p>}
+        {dish.notes && <p className={cn("text-xs leading-relaxed mb-3 line-clamp-2 italic", textNotes)}>{dish.notes}</p>}
         {dish.flavor_tags && dish.flavor_tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {dish.flavor_tags.slice(0, 3).map((tag) => <FlavorTag key={tag} tag={tag as any} size="sm" />)}
+            {dish.flavor_tags.slice(0, 3).map((tag) => <FlavorTag key={tag} tag={tag as any} size="sm" dark={dark} />)}
           </div>
         )}
       </div>

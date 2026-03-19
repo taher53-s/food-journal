@@ -17,9 +17,10 @@ const sizeClasses = {
   xl: "w-20 h-20 text-3xl",
 };
 
-export function RatingBadge({ rating, size = "md", animated = true, label, className }: RatingBadgeProps) {
+export function RatingBadge({ rating, size = "md", animated = true, label, className, dark = false }: RatingBadgeProps & { dark?: boolean }) {
   const colorClass = getRatingBg(rating);
   const display = rating % 1 === 0 ? rating.toFixed(0) : rating.toFixed(1);
+  const labelClass = dark ? "text-white/40" : "text-forest-500";
 
   if (!animated) {
     return (
@@ -27,7 +28,7 @@ export function RatingBadge({ rating, size = "md", animated = true, label, class
         <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold shadow-sm", sizeClasses[size], colorClass)}>
           {display}
         </div>
-        {label && <span className="text-[10px] font-medium text-forest-500 uppercase tracking-widest">{label}</span>}
+        {label && <span className={`text-[10px] font-medium uppercase tracking-widest ${labelClass}`}>{label}</span>}
       </div>
     );
   }
@@ -44,18 +45,21 @@ export function RatingBadge({ rating, size = "md", animated = true, label, class
       <div className={cn("inline-flex items-center justify-center rounded-2xl border-2 font-display font-semibold shadow-sm", sizeClasses[size], colorClass)}>
         {display}
       </div>
-      {label && <span className="text-[10px] font-medium text-forest-500 uppercase tracking-widest">{label}</span>}
+      {label && <span className={`text-[10px] font-medium uppercase tracking-widest ${labelClass}`}>{label}</span>}
     </motion.div>
   );
 }
 
-export function RatingBar({ label, rating, delay = 0 }: { label: string; rating: number; delay?: number }) {
+export function RatingBar({ label, rating, delay = 0, dark = false }: { label: string; rating: number; delay?: number; dark?: boolean }) {
   const pct = (rating / 10) * 100;
   const color = rating >= 9 ? "bg-gold-400" : rating >= 7 ? "bg-forest-500" : rating >= 5 ? "bg-ember-400" : "bg-red-400";
+  const labelClass = dark ? "text-white/40" : "text-forest-500";
+  const valueClass = dark ? "text-white/70" : "text-forest-700";
+  const trackClass = dark ? "bg-white/10" : "bg-forest-100";
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-forest-500 w-20 text-right font-medium">{label}</span>
-      <div className="flex-1 h-2 bg-forest-100 rounded-full overflow-hidden">
+      <span className={`text-xs w-20 text-right font-medium ${labelClass}`}>{label}</span>
+      <div className={`flex-1 h-2 rounded-full overflow-hidden ${trackClass}`}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -63,7 +67,7 @@ export function RatingBar({ label, rating, delay = 0 }: { label: string; rating:
           className={cn("h-full rounded-full", color)}
         />
       </div>
-      <span className="text-xs font-semibold text-forest-700 w-8">{rating}</span>
+      <span className={`text-xs font-semibold w-8 ${valueClass}`}>{rating}</span>
     </div>
   );
 }

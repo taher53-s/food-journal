@@ -111,7 +111,7 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {topVisits.map((visit: any, i: number) => (
-                <RestaurantCard key={visit.id} visit={visit} index={i} />
+                <RestaurantCard key={visit.id} visit={visit} index={i} dark />
               ))}
             </div>
           </div>
@@ -141,7 +141,7 @@ export default async function HomePage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {recentVisits.map((visit: any, i: number) => (
-                <RestaurantCard key={visit.id} visit={visit} index={i} />
+                <RestaurantCard key={visit.id} visit={visit} index={i} dark />
               ))}
             </div>
             <FadeIn>

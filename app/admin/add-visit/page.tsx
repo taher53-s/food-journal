@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { motion } from "framer-motion";
 import { VisitForm } from "@/components/admin/VisitForm";
-import { FadeIn } from "@/components/animations/PageTransition";
+import { FadeIn, SectionHeading, AnimatedDivider } from "@/components/animations/PageTransition";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
@@ -13,17 +14,35 @@ export default async function AddVisitPage() {
   if (!user) redirect("/login");
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-[#0A1A12]">
+      {/* Ambient orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(27,94,67,0.07) 0%, transparent 70%)", filter: "blur(60px)" }} />
+      </div>
+
+      <div className="relative max-w-3xl mx-auto px-4 pt-32 pb-24">
         <FadeIn>
-          <div className="mb-8">
-            <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-forest-500 hover:text-forest-700 transition-colors mb-4">
+          <Link href="/admin" className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white/70 transition-colors mb-6 group">
+            <span
+              initial={{ x: 0 }}
+              whileHover={{ x: -4 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-            </Link>
-            <h1 className="font-display text-4xl md:text-5xl font-light text-forest-950">Add New Visit</h1>
-            <p className="text-forest-500 mt-2">Document your latest dining experience</p>
-          </div>
+            </span>
+          </Link>
         </FadeIn>
+        <FadeIn delay={0.05}>
+          <SectionHeading
+            eyebrow="★ Document"
+            title="Add New Visit"
+            subtitle="Document your latest dining experience"
+            dark
+          />
+        </FadeIn>
+        <AnimatedDivider className="mb-10" dark />
         <FadeIn delay={0.1}><VisitForm /></FadeIn>
       </div>
     </div>

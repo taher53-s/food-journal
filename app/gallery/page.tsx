@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { FadeIn, SectionHeading, AnimatedDivider } from "@/components/animations/PageTransition";
+import { FadeIn, StaggerContainer, StaggerItem, SectionHeading, AnimatedDivider } from "@/components/animations/PageTransition";
 import { GalleryClient } from "./GalleryClient";
 import fs from "fs";
 import path from "path";
@@ -31,7 +31,6 @@ export default async function GalleryPage() {
 
   const all = photos || [];
 
-  // Build restaurant image lookup
   const restaurantNames = Array.from(new Set(all.map((p: any) => p.restaurant_visits?.restaurant_name).filter(Boolean)));
   const restaurantImages: Record<string, string[]> = {};
   for (let i = 0; i < restaurantNames.length; i++) {
@@ -39,7 +38,6 @@ export default async function GalleryPage() {
     restaurantImages[name] = getLocalImages(name);
   }
 
-  // Attach local images to photos
   const enrichedPhotos = all.map((photo: any, idx: number) => {
     const restaurantName = photo.restaurant_visits?.restaurant_name;
     const localImages = restaurantImages[restaurantName] || [];
@@ -56,18 +54,25 @@ export default async function GalleryPage() {
   const visitCount = Array.from(new Set(all.map((p: any) => p.visit_id))).length;
 
   return (
-    <div className="min-h-screen pt-24 pb-20 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0A1A12]">
+      {/* Ambient orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, rgba(245,158,11,0.05) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, rgba(27,94,67,0.07) 0%, transparent 70%)", filter: "blur(60px)" }} />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 pt-32 pb-24">
         <FadeIn>
           <SectionHeading
-            eyebrow="Visual Stories"
+            eyebrow="✦ Visual Stories"
             title="Food Gallery"
             subtitle={`${all.length} photos from ${visitCount} restaurant visits`}
             align="center"
+            dark
           />
         </FadeIn>
 
-        <AnimatedDivider className="mb-16" />
+        <AnimatedDivider className="mb-16" dark />
 
         <GalleryClient photos={enrichedPhotos} />
       </div>

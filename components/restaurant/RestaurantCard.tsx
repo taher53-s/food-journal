@@ -47,7 +47,7 @@ const LOCAL_IMAGE_MAP: Record<string, string[]> = {
   ],
 };
 
-export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; index?: number }) {
+export function RestaurantCard({ visit, index = 0, dark = false }: { visit: RestaurantVisit; index?: number; dark?: boolean }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const topDish = visit.dishes?.sort((a, b) => b.rating - a.rating)[0];
 
@@ -55,6 +55,19 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
   const localImage = localImages[index % localImages.length] || null;
   const coverPhoto = visit.photos?.find((p) => p.type === "food") || visit.photos?.[0];
   const displayImage = localImage || coverPhoto?.image_url;
+
+  const cardBg = dark ? "bg-white/[0.04] backdrop-blur-md border border-white/[0.08]" : "bg-white border border-forest-100/60 shadow-card";
+  const borderAccent = dark
+    ? (visit.recommendation_level === "must_try" ? "border-l-4 border-l-gold-400" : visit.recommendation_level === "worth_it" ? "border-l-4 border-l-gold-300/60" : "")
+    : (visit.recommendation_level === "must_try" ? "border-l-4 border-l-forest-500" : visit.recommendation_level === "worth_it" ? "border-l-4 border-l-gold-400" : "");
+  const titleClass = dark ? "text-white/90 group-hover:text-white" : "text-forest-900 group-hover:text-forest-700";
+  const locationClass = dark ? "text-white/40" : "text-forest-500";
+  const cuisineTagClass = dark ? "bg-white/[0.1] text-white/70 backdrop-blur-sm" : "bg-black/30 text-white";
+  const metaClass = dark ? "text-white/30" : "text-forest-400";
+  const priceClass = dark ? "text-white/30 bg-white/[0.06]" : "text-forest-400 bg-forest-50";
+  const topDishBg = dark ? "bg-white/[0.05]" : "bg-forest-50";
+  const topDishLabel = dark ? "text-white/30" : "text-forest-500";
+  const topDishName = dark ? "text-white/70" : "text-forest-800";
 
   // Mouse tilt
   const mouseX = useMotionValue(0);
@@ -102,12 +115,9 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
 
         <div
           className={cn(
-            "relative bg-white rounded-3xl overflow-hidden transition-all duration-300 z-10",
-            visit.recommendation_level === "must_try"
-              ? "border-l-4 border-l-forest-500 shadow-card"
-              : visit.recommendation_level === "worth_it"
-              ? "border-l-4 border-l-gold-400 shadow-card"
-              : "border border-forest-100/60 shadow-card hover:shadow-card-hover"
+            "relative rounded-3xl overflow-hidden transition-all duration-300 z-10",
+            cardBg,
+            borderAccent
           )}
         >
           {/* Image container */}
@@ -157,25 +167,25 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
           <div className="p-5">
             <div className="flex items-start justify-between gap-3 mb-3">
               <div>
-                <h3 className="font-display text-xl font-semibold text-forest-900 group-hover:text-forest-700 transition-colors leading-tight">
+                <h3 className={cn("font-display text-xl font-semibold transition-colors leading-tight", titleClass)}>
                   {visit.restaurant_name}
                 </h3>
-                <div className="flex items-center gap-1.5 mt-1 text-forest-500 text-xs">
+                <div className={cn("flex items-center gap-1.5 mt-1 text-xs", locationClass)}>
                   <MapPin className="w-3 h-3" /><span>{visit.location}</span>
                 </div>
               </div>
-              <span className="text-xs font-medium text-forest-400 bg-forest-50 px-2 py-1 rounded-lg shrink-0">
+              <span className={cn("text-xs font-medium px-2 py-1 rounded-lg shrink-0", priceClass)}>
                 {priceRangeLabel[visit.price_range].split(" ")[0]}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-xs text-forest-400 mb-4">
+            <div className={cn("flex items-center gap-3 text-xs mb-4", metaClass)}>
               <div className="flex items-center gap-1"><Calendar className="w-3 h-3" /><span>{formatDateShort(visit.date_visited)}</span></div>
               {visit.companions && <div className="flex items-center gap-1"><Users className="w-3 h-3" /><span className="truncate max-w-[120px]">{visit.companions}</span></div>}
             </div>
 
             {visit.experience_notes && (
-              <p className="text-sm text-forest-600 leading-relaxed mb-4 line-clamp-2 italic font-display">
+              <p className={cn("text-sm leading-relaxed mb-4 line-clamp-2 italic font-display", dark ? "text-white/50" : "text-forest-600")}>
                 &ldquo;{visit.experience_notes}&rdquo;
               </p>
             )}
@@ -186,28 +196,28 @@ export function RestaurantCard({ visit, index = 0 }: { visit: RestaurantVisit; i
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="flex items-center gap-2 p-3 bg-forest-50 rounded-2xl mb-4"
+                className={cn("flex items-center gap-2 p-3 rounded-2xl mb-4", topDishBg)}
               >
                 <span className="text-xl">🥇</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-forest-500 font-medium uppercase tracking-wider">Top Dish</p>
-                  <p className="text-sm font-semibold text-forest-800 truncate">{topDish.dish_name}</p>
+                  <p className={cn("text-xs font-medium uppercase tracking-wider", topDishLabel)}>Top Dish</p>
+                  <p className={cn("text-sm font-semibold truncate", topDishName)}>{topDish.dish_name}</p>
                 </div>
-                <span className={cn("text-sm font-bold font-display px-2 py-0.5 rounded-lg", topDish.rating >= 9 ? "text-gold-600 bg-gold-50" : "text-forest-700 bg-forest-100")}>
+                <span className={cn("text-sm font-bold font-display px-2 py-0.5 rounded-lg", topDish.rating >= 9 ? "text-gold-400 bg-gold-500/20" : dark ? "text-white/50 bg-white/10" : "text-forest-700 bg-forest-100")}>
                   {topDish.rating}
                 </span>
               </motion.div>
             )}
 
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 text-forest-400 text-xs">
+              <div className={cn("flex items-center gap-1 text-xs", metaClass)}>
                 {visit.dishes && visit.dishes.length > 0 && <span>{visit.dishes.length} dish{visit.dishes.length !== 1 ? "es" : ""}</span>}
-                {visit.would_return && <span className="ml-1 text-forest-500 font-medium">· Would return ✓</span>}
+                {visit.would_return && <span className="ml-1 font-medium">· Would return ✓</span>}
               </div>
               <motion.div
                 animate={{ x: [0, 4, 0] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                className="flex items-center gap-1 text-forest-600 text-xs font-semibold"
+                className={cn("flex items-center gap-1 text-xs font-semibold", dark ? "text-white/30" : "text-forest-600")}
               >
                 <span>View</span><ArrowRight className="w-3 h-3" />
               </motion.div>

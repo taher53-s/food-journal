@@ -24,13 +24,16 @@ export function RankEmoji({ emoji, index }: RankEmojiProps) {
 
 interface CuisineEmojiProps {
   emoji: string;
+  dark?: boolean;
 }
 
-export function CuisineEmoji({ emoji }: CuisineEmojiProps) {
+export function CuisineEmoji({ emoji, dark = false }: CuisineEmojiProps) {
   return (
     <motion.div
-      className="w-12 h-12 bg-forest-50 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-all duration-300"
-      whileHover={{ scale: 1.1, backgroundColor: "rgb(220,240,228)" }}
+      className={cn("w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 transition-all duration-300",
+        dark ? "bg-white/[0.08]" : "bg-forest-50"
+      )}
+      whileHover={{ scale: 1.1, backgroundColor: dark ? "rgba(245,158,11,0.15)" : "rgb(220,240,228)" }}
     >
       {emoji}
     </motion.div>

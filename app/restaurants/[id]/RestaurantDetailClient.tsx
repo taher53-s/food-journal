@@ -65,9 +65,12 @@ interface SidebarRankItemProps {
   name: string;
   rating: number;
   index: number;
+  dark?: boolean;
 }
 
-export function SidebarRankItem({ emoji, name, rating, index }: SidebarRankItemProps) {
+export function SidebarRankItem({ emoji, name, rating, index, dark = false }: SidebarRankItemProps) {
+  const nameClass = dark ? "text-white/80" : "text-forest-700";
+  const valueClass = dark ? "text-white/50" : "text-forest-600";
   return (
     <motion.div
       initial={{ opacity: 0, x: 16 }}
@@ -77,8 +80,8 @@ export function SidebarRankItem({ emoji, name, rating, index }: SidebarRankItemP
       className="flex items-center gap-3"
     >
       <span className="text-base w-6 text-center">{emoji}</span>
-      <span className="flex-1 text-xs font-medium text-forest-700 truncate">{name}</span>
-      <span className="text-xs font-bold text-forest-600 font-display">{rating}</span>
+      <span className={`flex-1 text-xs font-medium truncate ${nameClass}`}>{name}</span>
+      <span className={`text-xs font-bold font-display ${valueClass}`}>{rating}</span>
     </motion.div>
   );
 }

@@ -2,6 +2,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { DeleteVisitButton } from "@/components/admin/DeleteVisitButton";
@@ -15,6 +16,7 @@ interface RestaurantHeroProps {
 }
 
 export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdmin, visitId }: RestaurantHeroProps) {
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
@@ -46,12 +48,12 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
         transition={{ duration: 0.5, delay: 0.2 }}
         className="absolute top-6 left-6"
       >
-        <Link
-          href="/restaurants"
+        <button
+          onClick={() => router.back()}
           className="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-white/25 transition-all"
         >
           <ArrowLeft className="w-4 h-4" /> Back
-        </Link>
+        </button>
       </motion.div>
 
       {/* Admin controls */}
