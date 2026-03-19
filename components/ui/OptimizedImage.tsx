@@ -37,21 +37,23 @@ export function OptimizedImage({
   }
 
   return (
-    <div className={cn("relative w-full h-full overflow-hidden", className)} style={style}>
-      {/* Dark bg gradient — visible when img fails */}
-      <div className="absolute inset-0 bg-gradient-to-br from-forest-900 via-forest-800 to-[#0A1A12] flex items-center justify-center">
+    <div
+      className={cn("relative w-full h-full overflow-hidden", className)}
+      style={style}
+    >
+      {/* Dark gradient bg — CSS grid stacking, no position:absolute issues */}
+      <div className="absolute inset-0 bg-gradient-to-br from-forest-900 via-forest-800 to-[#0A1A12] flex items-center justify-center z-0">
         <span className="text-5xl opacity-20">{fallbackEmoji}</span>
       </div>
 
-      {/* Native img: always rendered, no opacity tricks, no React state dependencies */}
+      {/* Image — z-10 puts it above the gradient, w-full h-full fills the relative parent */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="w-full h-full object-cover relative z-10"
         loading={priority ? "eager" : "lazy"}
         onError={() => setFailed(true)}
-        // Don't suppress errors — if onError fires, show the dark bg behind
       />
     </div>
   );
