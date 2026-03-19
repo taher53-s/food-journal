@@ -6,18 +6,30 @@ import { motion } from "framer-motion";
 import heic2any from "heic2any";
 import { FlavorTagSelector } from "@/components/ui/FlavorTag";
 import { FlavorTag } from "@/types";
-import { Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2, Upload, ImageIcon, Camera } from "lucide-react";
 
 const OCCASIONS = ["date", "friends", "family", "solo", "business", "celebration"];
 const PRICE_RANGES = ["budget", "moderate", "expensive", "luxury"];
 const RECOMMENDATION_LEVELS = ["must_try", "worth_it", "decent", "skip"];
 const CUISINES = ["Italian", "Japanese", "Indian", "Mexican", "French", "Chinese", "Thai", "Mediterranean", "American", "Korean", "Spanish", "New Nordic", "Middle Eastern", "Vietnamese", "Greek", "Other"];
+const PHOTO_TYPES = [
+  { value: "food", label: "Food", icon: Camera },
+  { value: "interior", label: "Interior", icon: ImageIcon },
+  { value: "exterior", label: "Exterior", icon: ImageIcon },
+  { value: "menu", label: "Menu", icon: ImageIcon },
+];
 
 interface DishEntry {
-  /** If set, this is an existing dish to update; otherwise a new dish to insert */
   id?: string;
   dish_name: string; price: string; rating: number;
   notes: string; flavor_tags: FlavorTag[]; image: File | null;
+}
+
+interface PhotoEntry {
+  id?: string;
+  type: string;
+  caption: string;
+  image: File | null;
 }
 
 function RatingSlider({ label, value, onChange, dark }: { label: string; value: number; onChange: (v: number) => void; dark?: boolean }) {
@@ -43,6 +55,22 @@ function RatingSlider({ label, value, onChange, dark }: { label: string; value: 
   );
 }
 
+async function convertImage(file: File): Promise<{ file: File; ext: string }> {
+  const ext = file.name.split(".").pop()?.toLowerCase() || "";
+  if (ext === "heic" || ext === "heif") {
+    try {
+      const convertedBlob = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.8 });
+      const blobArray = Array.isArray(convertedBlob) ? convertedBlob : [convertedBlob];
+      const blob = blobArray[0];
+      const converted = new File([blob], file.name.replace(/\.heic|\.heif/i, ".jpg"), { type: "image/jpeg" });
+      return { file: converted, ext: "jpg" };
+    } catch {
+      // heic2any not supported, fall through — try uploading as-is
+    }
+  }
+  return { file, ext };
+}
+
 export function VisitForm({ initialData, visitId, dark = true }: { initialData?: any; visitId?: string; dark?: boolean }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -64,6 +92,7 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
     experience_notes: initialData?.experience_notes || "",
     would_return: initialData?.would_return ?? true,
     recommendation_level: initialData?.recommendation_level || "worth_it",
+    total_bill: initialData?.total_bill || "",
   });
   const [dishes, setDishes] = useState<DishEntry[]>(
     initialData?.dishes?.map((d: any) => ({
@@ -76,8 +105,16 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
       image: null,
     })) || []
   );
-  /** IDs of dishes that existed when the form loaded — used to detect removals */
+  const [photos, setPhotos] = useState<PhotoEntry[]>(
+    initialData?.photos?.map((p: any) => ({
+      id: p.id,
+      type: p.type || "interior",
+      caption: p.caption || "",
+      image: null,
+    })) || []
+  );
   const originalDishIds = initialData?.dishes?.map((d: any) => d.id).filter(Boolean) || [];
+  const originalPhotoIds = initialData?.photos?.map((p: any) => p.id).filter(Boolean) || [];
   const setField = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
   const addDish = () => setDishes([...dishes, { dish_name: "", price: "", rating: 7, notes: "", flavor_tags: [], image: null }]);
   const updateDish = (i: number, key: keyof DishEntry, value: any) => {
@@ -86,6 +123,13 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
     setDishes(updated);
   };
   const removeDish = (i: number) => setDishes(dishes.filter((_, idx) => idx !== i));
+  const addPhoto = () => setPhotos([...photos, { type: "interior", caption: "", image: null }]);
+  const updatePhoto = (i: number, key: keyof PhotoEntry, value: any) => {
+    const updated = [...photos];
+    (updated[i] as any)[key] = value;
+    setPhotos(updated);
+  };
+  const removePhoto = (i: number) => setPhotos(photos.filter((_, idx) => idx !== i));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,76 +141,81 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
       if (!user) throw new Error("Not authenticated");
 
       let visitResult;
+      const formData = { ...form, user_id: visitId ? undefined : user.id };
       if (visitId) {
-        const { data, error } = await supabase.from("restaurant_visits").update({ ...form }).eq("id", visitId).select().single();
-        if (error) throw error;
-        visitResult = data;
+        const { data, error } = await supabase.from("restaurant_visits").update(formData).eq("id", visitId).select().single();
+        if (error) {
+          // If total_bill column doesn't exist, retry without it
+          if (error.message.includes("total_bill") || error.code === "42703") {
+            const { data: retryData, error: retryErr } = await supabase.from("restaurant_visits").update({ ...formData, total_bill: undefined }).eq("id", visitId).select().single();
+            if (retryErr) throw retryErr;
+            visitResult = retryData;
+          } else {
+            throw error;
+          }
+        } else {
+          visitResult = data;
+        }
       } else {
-        const { data, error } = await supabase.from("restaurant_visits").insert({ ...form, user_id: user.id }).select().single();
-        if (error) throw error;
-        visitResult = data;
+        const { data, error } = await supabase.from("restaurant_visits").insert(formData).select().single();
+        if (error) {
+          if (error.message.includes("total_bill") || error.code === "42703") {
+            const { data: retryData, error: retryErr } = await supabase.from("restaurant_visits").insert({ ...formData, total_bill: undefined }).select().single();
+            if (retryErr) throw retryErr;
+            visitResult = retryData;
+          } else {
+            throw error;
+          }
+        } else {
+          visitResult = data;
+        }
       }
 
-      // Detect removed dishes: existing IDs no longer in the form
-      const currentIds = dishes.map(d => d.id).filter(Boolean) as string[];
-      const removedIds = originalDishIds.filter((id: string) => !currentIds.includes(id));
-
-      // Delete removed dishes
-      if (removedIds.length > 0) {
-        const { error: delErr } = await supabase.from("dishes").delete().in("id", removedIds);
+      // Detect removed dishes
+      const currentDishIds = dishes.map(d => d.id).filter(Boolean) as string[];
+      const removedDishIds = originalDishIds.filter((id: string) => !currentDishIds.includes(id));
+      if (removedDishIds.length > 0) {
+        const { error: delErr } = await supabase.from("dishes").delete().in("id", removedDishIds);
         if (delErr) throw delErr;
       }
 
+      // Detect removed photos
+      const currentPhotoIds = photos.map(p => p.id).filter(Boolean) as string[];
+      const removedPhotoIds = originalPhotoIds.filter((id: string) => !currentPhotoIds.includes(id));
+      if (removedPhotoIds.length > 0) {
+        const { error: delErr } = await supabase.from("photos").delete().in("id", removedPhotoIds);
+        if (delErr) throw delErr;
+      }
+
+      // Process dishes
       for (const dish of dishes) {
         if (!dish.dish_name) continue;
-        let image_url = null;
+        let image_url: string | null = null;
         if (dish.image) {
-          let fileToUpload = dish.image;
-          let filename = dish.image.name;
-          let ext = filename.split(".").pop()?.toLowerCase() || '';
-
-          if (ext === "heic" || ext === "heif") {
-            setIsConverting(true);
-            try {
-              const convertedBlob = await heic2any({
-                blob: dish.image,
-                toType: "image/jpeg",
-                quality: 0.8,
-              });
-              const blobArray = Array.isArray(convertedBlob) ? convertedBlob : [convertedBlob];
-              const blob = blobArray[0];
-              fileToUpload = new File([blob], filename.replace(/\.heic|\.heif/i, ".jpg"), {
-                type: "image/jpeg"
-              });
-              ext = "jpg";
-            } catch (convErr: any) {
-              console.error("HEIC conversion failed:", convErr);
-              throw new Error("Failed to convert HEIC/HEIF image. Please try another format.");
-            } finally {
-              setIsConverting(false);
-            }
+          setIsConverting(true);
+          let fileToUpload: File;
+          let ext: string;
+          try {
+            const converted = await convertImage(dish.image);
+            fileToUpload = converted.file;
+            ext = converted.ext;
+          } catch {
+            throw new Error("Failed to convert HEIC image. Please convert to JPEG before uploading.");
+          } finally {
+            setIsConverting(false);
           }
 
-          const path = `${visitResult.id}/${Date.now()}.${ext}`;
-
+          const path = `${visitResult.id}/${Date.now()}-dish.${ext}`;
           const { data: up, error: upErr } = await supabase.storage.from("food-photos").upload(path, fileToUpload, {
             contentType: fileToUpload.type,
             upsert: false
           });
-
-          if (!upErr && up) {
-            const { data: { publicUrl } } = supabase.storage.from("food-photos").getPublicUrl(up.path);
-            if (!publicUrl) {
-              throw new Error("Failed to receive public URL for the uploaded image.");
-            }
-            image_url = publicUrl;
-          } else if (upErr) {
-            throw upErr;
-          }
+          if (upErr) throw upErr;
+          const { data: { publicUrl } } = supabase.storage.from("food-photos").getPublicUrl(up.path);
+          image_url = publicUrl;
         }
 
         if (dish.id) {
-          // Existing dish — update it
           const { error: updErr } = await supabase.from("dishes").update({
             dish_name: dish.dish_name,
             price: dish.price ? parseFloat(dish.price) : null,
@@ -177,12 +226,56 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
           }).eq("id", dish.id);
           if (updErr) throw updErr;
         } else {
-          // New dish — insert it
           const { error: insErr } = await supabase.from("dishes").insert({
             visit_id: visitResult.id, dish_name: dish.dish_name,
             price: dish.price ? parseFloat(dish.price) : null,
             rating: dish.rating, notes: dish.notes || null,
             flavor_tags: dish.flavor_tags, image_url,
+          });
+          if (insErr) throw insErr;
+        }
+      }
+
+      // Process photos (interior, exterior, menu)
+      for (const photo of photos) {
+        if (!photo.image) continue;
+        let image_url: string | null = null;
+
+        setIsConverting(true);
+        let fileToUpload: File;
+        let ext: string;
+        try {
+          const converted = await convertImage(photo.image);
+          fileToUpload = converted.file;
+          ext = converted.ext;
+        } catch {
+          throw new Error("Failed to convert HEIC image. Please convert to JPEG before uploading.");
+        } finally {
+          setIsConverting(false);
+        }
+
+        const photoPath = `${visitResult.id}/${Date.now()}-${photo.type}.${ext}`;
+        const { data: up, error: upErr } = await supabase.storage.from("food-photos").upload(photoPath, fileToUpload, {
+          contentType: fileToUpload.type,
+          upsert: false
+        });
+        if (upErr) throw upErr;
+        const { data: { publicUrl } } = supabase.storage.from("food-photos").getPublicUrl(up.path);
+        image_url = publicUrl;
+
+        if (photo.id) {
+          const { error: updErr } = await supabase.from("photos").update({
+            type: photo.type,
+            caption: photo.caption || null,
+            image_url,
+          }).eq("id", photo.id);
+          if (updErr) throw updErr;
+        } else {
+          const { error: insErr } = await supabase.from("photos").insert({
+            visit_id: visitResult.id,
+            type: photo.type,
+            caption: photo.caption || null,
+            image_url,
           });
           if (insErr) throw insErr;
         }
@@ -205,6 +298,7 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
     : "bg-white rounded-3xl p-6 border border-forest-100/60 shadow-card space-y-5";
   const sectionTitleClass = dark ? "font-display text-xl font-semibold text-white/90" : "font-display text-xl font-semibold text-forest-900";
   const dishCardClass = dark ? "bg-white/[0.06] rounded-2xl p-5 space-y-4" : "bg-forest-50 rounded-2xl p-5 space-y-4";
+  const photoCardClass = dark ? "bg-white/[0.06] rounded-2xl p-5 space-y-4" : "bg-forest-50 rounded-2xl p-5 space-y-4";
   const dishTextClass = dark ? "text-white/80" : "text-forest-800";
   const emptyStateClass = dark ? "text-white/30" : "text-forest-400";
   const errorClass = dark ? "text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3" : "text-red-500 text-sm bg-red-50 rounded-xl px-4 py-3";
@@ -245,6 +339,8 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
               {RECOMMENDATION_LEVELS.map((r) => <option key={r} value={r}>{r.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}</select></div>
           <div><label className={labelClass}>Companions</label>
             <input type="text" value={form.companions} onChange={(e) => setField("companions", e.target.value)} placeholder="Who did you go with?" className={inputClass} /></div>
+          <div><label className={labelClass}>Total Bill</label>
+            <input type="number" step="0.01" min="0" value={form.total_bill} onChange={(e) => setField("total_bill", e.target.value)} placeholder="e.g. 85.00" className={inputClass} /></div>
         </div>
         <div className="flex items-center gap-3">
           <input type="checkbox" id="would_return" checked={form.would_return} onChange={(e) => setField("would_return", e.target.checked)} className="w-5 h-5 rounded-lg accent-gold-500" />
@@ -280,7 +376,7 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
         </div>
         {dishes.map((dish, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-            className={dishCardClass}>
+            className={`${dishCardClass} mt-4 first:mt-0`}>
             <div className="flex items-center justify-between">
               <h4 className={`font-semibold ${dishTextClass} text-sm`}>Dish #{i + 1}</h4>
               <button type="button" onClick={() => removeDish(i)} className={dark ? "p-1.5 text-red-400 hover:text-red-300 rounded-lg hover:bg-red-500/10 transition-colors" : "p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"}>
@@ -289,7 +385,7 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
             </div>
             <div className="grid grid-cols-2 gap-3">
               <input type="text" placeholder="Dish name" value={dish.dish_name} onChange={(e) => updateDish(i, "dish_name", e.target.value)} className={inputClass} />
-              <input type="number" placeholder="Price" value={dish.price} onChange={(e) => updateDish(i, "price", e.target.value)} className={inputClass} />
+              <input type="number" step="0.01" min="0" placeholder="Price per dish" value={dish.price} onChange={(e) => updateDish(i, "price", e.target.value)} className={inputClass} />
             </div>
             <RatingSlider label="Rating" value={dish.rating} onChange={(v) => updateDish(i, "rating", v)} dark={dark} />
             <textarea placeholder="Notes on taste, texture..." value={dish.notes} onChange={(e) => updateDish(i, "notes", e.target.value)} rows={2} className={`${inputClass} resize-none`} />
@@ -315,12 +411,78 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
         )}
       </div>
 
+      {/* Restaurant Photos — Interior, Exterior, Menu */}
+      <div className={sectionClass}>
+        <div className="flex items-center justify-between">
+          <h2 className={sectionTitleClass}>Restaurant Photos</h2>
+          <button type="button" onClick={addPhoto} className={dark ? "btn-gold text-xs px-4 py-2.5 gap-1.5" : "btn-secondary text-xs px-4 py-2.5 gap-1.5"}>
+            <Plus className="w-3.5 h-3.5" /> Add Photo
+          </button>
+        </div>
+        {photos.map((photo, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+            className={`${photoCardClass} mt-4 first:mt-0`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Camera className={dark ? "w-4 h-4 text-white/40" : "w-4 h-4 text-forest-500"} />
+                <span className={`text-sm font-semibold ${dark ? "text-white/80" : "text-forest-800"}`}>Photo #{i + 1}</span>
+              </div>
+              <button type="button" onClick={() => removePhoto(i)} className={dark ? "p-1.5 text-red-400 hover:text-red-300 rounded-lg hover:bg-red-500/10 transition-colors" : "p-1.5 text-red-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"}>
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Type</label>
+                <div className="flex gap-2 flex-wrap">
+                  {PHOTO_TYPES.map(({ value, label, icon: Icon }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => updatePhoto(i, "type", value)}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border transition-all ${photo.type === value
+                        ? dark
+                          ? "bg-gold-500/20 border-gold-500/40 text-gold-400"
+                          : "bg-gold-50 border-gold-300 text-gold-700"
+                        : dark
+                          ? "bg-white/[0.06] border-white/[0.1] text-white/50 hover:border-white/20"
+                          : "bg-white border-forest-200 text-forest-600 hover:border-forest-400"
+                        }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />{label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className={labelClass}>Caption</label>
+                <input type="text" placeholder="e.g. Romantic corner seating" value={photo.caption} onChange={(e) => updatePhoto(i, "caption", e.target.value)} className={inputClass} />
+              </div>
+            </div>
+            <div>
+              <label className={labelClass}>Image</label>
+              <label className={uploadLabelClass}>
+                <Upload className={dark ? "w-4 h-4 text-white/40" : "w-4 h-4 text-forest-500"} />
+                <span className={uploadTextClass}>{photo.image ? photo.image.name : "Upload restaurant photo"}</span>
+                <input type="file" accept="image/*,.heic,.heif" className="hidden" onChange={(e) => updatePhoto(i, "image", e.target.files?.[0] || null)} />
+              </label>
+            </div>
+          </motion.div>
+        ))}
+        {photos.length === 0 && (
+          <div className={`text-center py-8 ${emptyStateClass} text-sm`}>
+            <div className="text-3xl mb-2">📷</div>
+            <p>Add interior, exterior, or menu photos</p>
+          </div>
+        )}
+      </div>
+
       {error && <p className={errorClass}>{error}</p>}
 
       <button type="submit" disabled={loading || isConverting} className="btn-gold w-full py-4 text-base disabled:opacity-60">
         {loading || isConverting ? (
-          <span className="flex items-center gap-2">
-            <span className="w-4 h-4 border-2 border-forest-950/40 border-t-forest-950 rounded-full animate-spin" />
+          <span className="flex items-center gap-2 justify-center">
+            <span className="w-4 h-4 border-2 border-[#0A1A12]/40 border-t-[#0A1A12] rounded-full animate-spin" />
             {isConverting ? "Converting image..." : "Saving..."}
           </span>
         ) : visitId ? "Update Visit" : "Save Visit"}

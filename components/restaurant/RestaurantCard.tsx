@@ -151,7 +151,7 @@ export function RestaurantCard({ visit, index = 0, dark = false }: { visit: Rest
               transition={{ duration: 0.4, delay: 0.2 }}
               className="absolute top-4 right-4"
             >
-              <RatingBadge rating={visit.overall_rating} size="sm" animated />
+              <RatingBadge rating={visit.overall_rating} size="sm" animated dark />
             </motion.div>
 
             {/* Bottom info */}

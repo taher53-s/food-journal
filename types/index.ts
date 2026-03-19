@@ -22,6 +22,7 @@ export interface RestaurantVisit {
   experience_notes: string | null;
   would_return: boolean;
   recommendation_level: RecommendationLevel;
+  total_bill: string | null;
   created_at: string;
   dishes?: Dish[];
   photos?: Photo[];

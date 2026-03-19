@@ -32,10 +32,10 @@ export const recommendationLabel: Record<RecommendationLevel, string> = {
 };
 
 export const recommendationColor: Record<RecommendationLevel, string> = {
-  must_try: "bg-forest-500 text-white",
-  worth_it: "bg-gold-500 text-forest-900",
-  decent: "bg-ember-300 text-white",
-  skip: "bg-gray-400 text-white",
+  must_try: "bg-gold-500/20 border border-gold-500/40 text-gold-400",
+  worth_it: "bg-white/[0.12] border border-white/20 text-white/80",
+  decent: "bg-ember-500/20 border border-ember-500/40 text-ember-300",
+  skip: "bg-white/[0.08] border border-white/10 text-white/40",
 };
 
 export const flavorTagColors: Record<FlavorTag, { bg: string; text: string; emoji: string }> = {
@@ -51,7 +51,13 @@ export const flavorTagColors: Record<FlavorTag, { bg: string; text: string; emoj
   rich: { bg: "bg-orange-100", text: "text-orange-700", emoji: "🥩" },
 };
 
-export function getRatingBg(rating: number): string {
+export function getRatingBg(rating: number, dark = false): string {
+  if (dark) {
+    if (rating >= 9) return "bg-gold-500/20 text-gold-400 border-gold-500/40";
+    if (rating >= 7) return "bg-white/[0.12] text-white/80 border-white/20";
+    if (rating >= 6) return "bg-red-500/20 text-red-400 border-red-500/40";
+    return "bg-red-500/20 text-red-400 border-red-500/40";
+  }
   if (rating >= 9) return "bg-gold-100 text-gold-700 border-gold-200";
   if (rating >= 7) return "bg-forest-100 text-forest-700 border-forest-200";
   if (rating >= 5) return "bg-ember-100 text-ember-600 border-ember-200";

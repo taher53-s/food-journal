@@ -24,14 +24,42 @@ function getLocalImages(restaurantName: string): string[] {
 
 export default async function GalleryPage() {
   const supabase = createClient();
+
+  // Fetch photos from photos table
   const { data: photos } = await supabase
     .from("photos")
     .select("*, restaurant_visits(restaurant_name, cuisine)")
     .order("created_at", { ascending: false });
 
-  const all = photos || [];
+  // Fetch dish photos too
+  const { data: dishPhotos } = await supabase
+    .from("dishes")
+    .select("id, image_url, dish_name, restaurant_visits!inner(restaurant_name, cuisine)")
+    .not("image_url", "is", null)
+    .order("created_at", { ascending: false });
 
-  const restaurantNames = Array.from(new Set(all.map((p: any) => p.restaurant_visits?.restaurant_name).filter(Boolean)));
+  // Union: mark photo entries and dish entries
+  const allPhotos = [
+    ...(photos || []).map((p: any) => ({
+      id: `photo-${p.id}`,
+      image_url: p.image_url,
+      caption: p.caption || p.restaurant_visits?.restaurant_name || "",
+      restaurant_name: p.restaurant_visits?.restaurant_name || "",
+      type: "photo",
+      is_dish: false,
+    })),
+    ...(dishPhotos || []).map((d: any) => ({
+      id: `dish-${d.id}`,
+      image_url: d.image_url,
+      caption: d.dish_name || "",
+      restaurant_name: d.restaurant_visits?.restaurant_name || "",
+      type: "dish",
+      is_dish: true,
+    })),
+  ].sort((a, b) => 0); // Keep as-is since both are already newest-first
+
+  const all = allPhotos;
+  const restaurantNames = Array.from(new Set(all.map((p: any) => p.restaurant_name).filter(Boolean)));
   const restaurantImages: Record<string, string[]> = {};
   for (let i = 0; i < restaurantNames.length; i++) {
     const name = restaurantNames[i];
@@ -39,19 +67,21 @@ export default async function GalleryPage() {
   }
 
   const enrichedPhotos = all.map((photo: any, idx: number) => {
-    const restaurantName = photo.restaurant_visits?.restaurant_name;
-    const localImages = restaurantImages[restaurantName] || [];
+    const localImages = restaurantImages[photo.restaurant_name] || [];
     const localSrc = localImages[idx % localImages.length] ?? undefined;
     return {
       id: photo.id,
       image_url: photo.image_url,
       caption: photo.caption,
-      restaurant_name: restaurantName,
+      restaurant_name: photo.restaurant_name,
       localSrc,
     };
   });
 
-  const visitCount = Array.from(new Set(all.map((p: any) => p.visit_id))).length;
+  const visitCount = new Set([
+    ...(photos || []).map((p: any) => p.visit_id).filter(Boolean),
+    ...(dishPhotos || []).map((d: any) => (d.restaurant_visits as any)?.id).filter(Boolean),
+  ]).size;
 
   return (
     <div className="min-h-screen bg-[#0A1A12]">
@@ -74,7 +104,20 @@ export default async function GalleryPage() {
 
         <AnimatedDivider className="mb-16" dark />
 
-        <GalleryClient photos={enrichedPhotos} />
+        {all.length === 0 ? (
+          <FadeIn>
+            <div className="relative overflow-hidden bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-4xl p-20 max-w-lg mx-auto text-center">
+              <div className="relative z-10">
+                <div className="text-7xl mb-6">📷</div>
+                <h3 className="font-display text-2xl text-white/80 mb-2">No photos yet</h3>
+                <p className="text-white/40 mb-6">Start adding photos to your restaurant visits.</p>
+                <a href="/admin/add-visit" className="btn-gold inline-flex">Add a Visit</a>
+              </div>
+            </div>
+          </FadeIn>
+        ) : (
+          <GalleryClient photos={enrichedPhotos} />
+        )}
       </div>
     </div>
   );

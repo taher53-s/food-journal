@@ -31,7 +31,7 @@ export function HallOfFameTopCard({ dish, index }: TopCardProps) {
       <motion.div
         whileHover={{ y: -8, scale: 1.02 }}
         transition={{ duration: 0.3 }}
-        className="relative bg-white rounded-3xl overflow-hidden shadow-luxury hover:shadow-glow-gold transition-all duration-500"
+        className="relative bg-white/[0.05] backdrop-blur-md border border-white/[0.08] rounded-3xl overflow-hidden shadow-luxury hover:shadow-glow-gold transition-all duration-500"
       >
         {/* Gold gradient border on hover */}
         <div

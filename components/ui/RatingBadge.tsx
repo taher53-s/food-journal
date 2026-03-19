@@ -18,7 +18,7 @@ const sizeClasses = {
 };
 
 export function RatingBadge({ rating, size = "md", animated = true, label, className, dark = false }: RatingBadgeProps & { dark?: boolean }) {
-  const colorClass = getRatingBg(rating);
+  const colorClass = getRatingBg(rating, dark);
   const display = rating % 1 === 0 ? rating.toFixed(0) : rating.toFixed(1);
   const labelClass = dark ? "text-white/40" : "text-forest-500";
 

@@ -23,6 +23,7 @@ export function DishCard({ dish, rank, isAdmin, index = 0, dark = false }: { dis
   const textTitle = dark ? "text-white/90" : "text-forest-900";
   const textPrice = dark ? "text-white/50" : "text-forest-400";
   const textNotes = dark ? "text-white/60" : "text-forest-600";
+  const priceCurrency = dark ? "text-gold-400/80" : "text-forest-400";
 
   const handleDelete = async () => {
     if (!confirm("Delete this dish?")) return;
@@ -73,12 +74,12 @@ export function DishCard({ dish, rank, isAdmin, index = 0, dark = false }: { dis
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         <div className="absolute bottom-3 right-3">
-          <RatingBadge rating={dish.rating} size="sm" animated={false} />
+          <RatingBadge rating={dish.rating} size="sm" animated={false} dark />
         </div>
       </div>
       <div className="p-4">
         <h4 className={cn("font-display text-lg font-semibold leading-tight mb-1 group-hover:opacity-80 transition-colors duration-200", textTitle)}>{dish.dish_name}</h4>
-        {dish.price && <p className={cn("text-xs font-medium mb-2", textPrice)}>₹{dish.price.toLocaleString("en-IN")}</p>}
+        {dish.price && <p className={cn("text-xs font-medium mb-2", priceCurrency)}>₹{dish.price.toLocaleString("en-IN")}</p>}
         {dish.notes && <p className={cn("text-xs leading-relaxed mb-3 line-clamp-2 italic", textNotes)}>{dish.notes}</p>}
         {dish.flavor_tags && dish.flavor_tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">

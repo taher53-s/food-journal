@@ -39,12 +39,16 @@ export default async function RestaurantPage({ params }: { params: { id: string 
   const sortedDishes = visit.dishes ? [...visit.dishes].sort((a: any, b: any) => b.rating - a.rating) : [];
 
   const localImages = LOCAL_IMAGE_MAP[visit.restaurant_name] || [];
-  const photosWithLocal = (visit.photos || []).map((photo: any, idx: number) => ({
+  const allPhotos = visit.photos || [];
+  const photosWithLocal = allPhotos.map((photo: any, idx: number) => ({
     ...photo,
     localUrl: localImages[idx] || null,
   }));
   const coverPhoto = photosWithLocal.find((p: any) => p.type === "food") || photosWithLocal[0];
   const displayImageUrl = coverPhoto?.localUrl || coverPhoto?.image_url;
+  // Separate restaurant photos (interior, exterior, menu) from dish photos
+  const restaurantPhotos = photosWithLocal.filter((p: any) => ["interior", "exterior", "menu"].includes(p.type));
+  const otherPhotos = photosWithLocal.filter((p: any) => !["interior", "exterior", "menu"].includes(p.type) || photosWithLocal.length === 0);
 
   return (
     <div className="min-h-screen">
@@ -106,7 +110,7 @@ export default async function RestaurantPage({ params }: { params: { id: string 
                 </div>
                 <div className="mt-6 pt-6 border-t border-white/[0.06] flex items-center justify-between">
                   <span className="text-sm font-semibold text-white/60 uppercase tracking-wider">Overall</span>
-                  <RatingBadge rating={visit.overall_rating} size="lg" label="/ 10" />
+                  <RatingBadge rating={visit.overall_rating} size="lg" label="/ 10" dark />
                 </div>
               </div>
             </FadeIn>
@@ -126,23 +130,34 @@ export default async function RestaurantPage({ params }: { params: { id: string 
               </div>
             )}
 
-            {/* Photo gallery */}
-            {photosWithLocal.length > 1 && (
+            {/* Restaurant Photos — interior, exterior, menu */}
+            {restaurantPhotos.length > 0 && (
               <FadeIn delay={0.1}>
                 <div>
-                  <SectionHeading title="Photos" />
+                  <SectionHeading title="Restaurant Photos" />
                   <AnimatedDivider className="mb-6" />
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {photosWithLocal.map((photo: any, i: number) => {
+                    {restaurantPhotos.map((photo: any, i: number) => {
                       const imgSrc = photo.localUrl || photo.image_url;
+                      const typeLabel = photo.type ? photo.type.charAt(0).toUpperCase() + photo.type.slice(1) : "Photo";
                       return (
-                        <PhotoItem key={photo.id} index={i} isFirst={i === 0}>
-                          <OptimizedImage
-                            src={imgSrc}
-                            alt={photo.caption || `Photo ${i + 1}`}
-                            fallbackEmoji="🖼️"
-                          />
-                        </PhotoItem>
+                        <div key={photo.id} className="relative group">
+                          <PhotoItem index={i} isFirst={i === 0}>
+                            <OptimizedImage
+                              src={imgSrc}
+                              alt={photo.caption || `${typeLabel} photo`}
+                              fallbackEmoji="🖼️"
+                            />
+                          </PhotoItem>
+                          {photo.caption && (
+                            <div className="absolute bottom-2 left-2 right-2 z-10">
+                              <div className="bg-[#0A1A12]/80 backdrop-blur-sm rounded-lg px-2 py-1 text-xs text-white/80 truncate">{photo.caption}</div>
+                            </div>
+                          )}
+                          <div className="absolute top-2 right-2 z-10">
+                            <span className="bg-[#0A1A12]/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] text-white/50 capitalize">{photo.type}</span>
+                          </div>
+                        </div>
                       );
                     })}
                   </div>
@@ -157,6 +172,12 @@ export default async function RestaurantPage({ params }: { params: { id: string 
               <div className="bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-3xl p-6 space-y-4 sticky top-24">
                 <SectionHeading title="Details" />
                 <div className="space-y-3 text-sm">
+                  {visit.total_bill && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-white/40">Total Bill</span>
+                      <span className="font-medium text-gold-400 font-display">£{parseFloat(visit.total_bill).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <span className="text-white/40">Price Range</span>
                     <span className="font-medium text-white/70">{priceRangeLabel[visit.price_range as keyof typeof priceRangeLabel]}</span>
