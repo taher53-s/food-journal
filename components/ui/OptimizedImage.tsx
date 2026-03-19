@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface OptimizedImageProps {
@@ -18,76 +18,41 @@ export function OptimizedImage({
   className,
   fallbackEmoji = "🍽️",
   priority = false,
-  sizes,
   style,
 }: OptimizedImageProps) {
-  const [phase, setPhase] = useState<"loading" | "loaded" | "error">("loading");
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  useEffect(() => {
-    // Reset when src changes
-    setPhase("loading");
-    if (imgRef.current) {
-      imgRef.current.onload = null;
-      imgRef.current.onerror = null;
-      // Force re-evaluate
-      if (imgRef.current.complete) {
-        if (imgRef.current.naturalWidth > 0) {
-          setPhase("loaded");
-        } else {
-          setPhase("error");
-        }
-      }
-    }
-  }, [src]);
+  const [failed, setFailed] = useState(false);
 
   if (!src) {
     return (
       <div
         className={cn(
-          "w-full h-full bg-gradient-to-br from-forest-800/60 to-forest-900/40 flex items-center justify-center",
+          "w-full h-full bg-gradient-to-br from-forest-900 via-forest-800 to-[#0A1A12] flex items-center justify-center",
           className
         )}
         style={style}
       >
-        <span className="text-5xl opacity-30">{fallbackEmoji}</span>
+        <span className="text-5xl opacity-20">{fallbackEmoji}</span>
       </div>
     );
   }
 
   return (
     <div className={cn("relative w-full h-full overflow-hidden", className)} style={style}>
-      {/* Loading skeleton */}
-      {phase === "loading" && (
-        <div className="absolute inset-0 bg-gradient-to-br from-forest-800/40 to-forest-900/20 animate-pulse" />
-      )}
+      {/* Dark bg gradient — visible when img fails */}
+      <div className="absolute inset-0 bg-gradient-to-br from-forest-900 via-forest-800 to-[#0A1A12] flex items-center justify-center">
+        <span className="text-5xl opacity-20">{fallbackEmoji}</span>
+      </div>
 
-      {/* Native img — works reliably on all devices/browsers */}
+      {/* Native img: always rendered, no opacity tricks, no React state dependencies */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        ref={imgRef}
         src={src}
         alt={alt}
-        className={cn(
-          "w-full h-full object-cover transition-opacity duration-500",
-          phase === "loaded" ? "opacity-100" : "opacity-0"
-        )}
-        onLoad={(e) => {
-          const img = e.currentTarget;
-          if (img.naturalWidth > 0) setPhase("loaded");
-          else setPhase("error");
-        }}
-        onError={() => setPhase("error")}
+        className="absolute inset-0 w-full h-full object-cover"
         loading={priority ? "eager" : "lazy"}
-        decoding="async"
+        onError={() => setFailed(true)}
+        // Don't suppress errors — if onError fires, show the dark bg behind
       />
-
-      {/* Error placeholder: gradient + emoji */}
-      {phase === "error" && (
-        <div className="absolute inset-0 bg-gradient-to-br from-forest-800/60 to-forest-900/40 flex items-center justify-center">
-          <span className="text-5xl opacity-30">{fallbackEmoji}</span>
-        </div>
-      )}
     </div>
   );
 }
