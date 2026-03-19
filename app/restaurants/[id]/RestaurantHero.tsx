@@ -29,7 +29,7 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
   return (
     <div ref={ref} className="relative h-96 md:h-[520px] overflow-hidden">
       {/* Parallax image layer */}
-      <motion.div style={{ y: imageY, scale }} className="absolute inset-0">
+      <motion.div style={{ y: imageY, scale }} className="absolute inset-0 z-10">
         <OptimizedImage
           src={displayImageUrl}
           alt={restaurantName}
@@ -46,11 +46,11 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="absolute top-6 left-6"
+        className="absolute top-6 left-6 z-20"
       >
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 bg-white/15 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-white/25 transition-all"
+          className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/20 text-white px-4 py-2.5 rounded-2xl text-sm font-medium hover:bg-black/60 transition-all shadow-lg shadow-black/20"
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
@@ -62,7 +62,7 @@ export function RestaurantHero({ displayImageUrl, restaurantName, cuisine, isAdm
           initial={{ opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className="absolute top-6 right-6 flex gap-2"
+          className="absolute top-6 right-6 z-20 flex gap-2"
         >
           <Link
             href={`/admin/edit/${visitId}`}

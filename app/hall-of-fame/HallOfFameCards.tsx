@@ -69,9 +69,9 @@ export function HallOfFameTopCard({ dish, index }: TopCardProps) {
         {/* Content */}
         <div className="p-5">
           <h3 className="font-display text-xl font-semibold text-white mb-1">{dish.dish_name}</h3>
-          <p className="text-sm text-white/50 mb-3">{dish.restaurant_visits?.restaurant_name} · {dish.restaurant_visits?.cuisine}</p>
+          <p className="text-sm text-white/60 mb-3">{dish.restaurant_visits?.restaurant_name} · {dish.restaurant_visits?.cuisine}</p>
           {dish.notes && (
-            <p className="text-xs text-white/40 italic line-clamp-2 mb-3 font-display">&ldquo;{dish.notes}&rdquo;</p>
+            <p className="text-xs text-white/50 italic line-clamp-2 mb-3 font-display">&ldquo;{dish.notes}&rdquo;</p>
           )}
           {dish.flavor_tags && dish.flavor_tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">

@@ -61,10 +61,10 @@ export function RestaurantCard({ visit, index = 0, dark = false }: { visit: Rest
     ? (visit.recommendation_level === "must_try" ? "border-l-4 border-l-gold-400" : visit.recommendation_level === "worth_it" ? "border-l-4 border-l-gold-300/60" : "")
     : (visit.recommendation_level === "must_try" ? "border-l-4 border-l-forest-500" : visit.recommendation_level === "worth_it" ? "border-l-4 border-l-gold-400" : "");
   const titleClass = dark ? "text-white/90 group-hover:text-white" : "text-forest-900 group-hover:text-forest-700";
-  const locationClass = dark ? "text-white/40" : "text-forest-500";
-  const cuisineTagClass = dark ? "bg-white/[0.1] text-white/70 backdrop-blur-sm" : "bg-black/30 text-white";
-  const metaClass = dark ? "text-white/30" : "text-forest-400";
-  const priceClass = dark ? "text-white/30 bg-white/[0.06]" : "text-forest-400 bg-forest-50";
+  const locationClass = dark ? "text-white/50" : "text-forest-500";
+  const cuisineTagClass = dark ? "bg-white/[0.1] text-white/80 backdrop-blur-sm" : "bg-black/30 text-white";
+  const metaClass = dark ? "text-white/40" : "text-forest-400";
+  const priceClass = dark ? "text-white/40 bg-white/[0.06]" : "text-forest-400 bg-forest-50";
   const topDishBg = dark ? "bg-white/[0.05]" : "bg-forest-50";
   const topDishLabel = dark ? "text-white/30" : "text-forest-500";
   const topDishName = dark ? "text-white/70" : "text-forest-800";
@@ -217,7 +217,7 @@ export function RestaurantCard({ visit, index = 0, dark = false }: { visit: Rest
               <motion.div
                 animate={{ x: [0, 4, 0] }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                className={cn("flex items-center gap-1 text-xs font-semibold", dark ? "text-white/30" : "text-forest-600")}
+                className={cn("flex items-center gap-1 text-xs font-semibold", dark ? "text-white/40" : "text-forest-600")}
               >
                 <span>View</span><ArrowRight className="w-3 h-3" />
               </motion.div>

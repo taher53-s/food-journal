@@ -21,8 +21,8 @@ export function DishCard({ dish, rank, isAdmin, index = 0, dark = false }: { dis
   const isTopThree = rank !== undefined && rank < 3;
   const cardBg = dark ? "bg-white/[0.04] backdrop-blur-md border border-white/[0.08]" : "bg-white border border-forest-100/60";
   const textTitle = dark ? "text-white/90" : "text-forest-900";
-  const textPrice = dark ? "text-white/40" : "text-forest-400";
-  const textNotes = dark ? "text-white/50" : "text-forest-600";
+  const textPrice = dark ? "text-white/50" : "text-forest-400";
+  const textNotes = dark ? "text-white/60" : "text-forest-600";
 
   const handleDelete = async () => {
     if (!confirm("Delete this dish?")) return;

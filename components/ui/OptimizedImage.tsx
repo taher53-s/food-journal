@@ -32,7 +32,6 @@ export function OptimizedImage({
   };
 
   const handleFallbackError = () => {
-    // Fallback image also failed — silently keep showing placeholder emoji
     setShowFallback(true);
   };
 
@@ -40,12 +39,12 @@ export function OptimizedImage({
     return (
       <div
         className={cn(
-          "w-full h-full bg-gradient-to-br from-forest-100 to-forest-200 flex items-center justify-center",
+          "w-full h-full bg-gradient-to-br from-forest-800/60 to-forest-900/40 flex items-center justify-center",
           className
         )}
         style={style}
       >
-        <span className="text-5xl opacity-60">{fallbackEmoji}</span>
+        <span className="text-5xl opacity-30">{fallbackEmoji}</span>
       </div>
     );
   }
@@ -82,13 +81,13 @@ export function OptimizedImage({
 
       {/* Skeleton while loading */}
       {!imgLoaded && !imgError && (
-        <div className="absolute inset-0 bg-forest-100 animate-pulse" />
+        <div className="absolute inset-0 bg-gradient-to-br from-forest-800/40 to-forest-900/20 animate-pulse" />
       )}
 
       {/* Emoji placeholder overlay if both image and fallback fail */}
       {showFallback && !imgLoaded && (
-        <div className="absolute inset-0 bg-gradient-to-br from-forest-100 to-forest-200 flex items-center justify-center">
-          <span className="text-4xl opacity-60">{fallbackEmoji}</span>
+        <div className="absolute inset-0 bg-gradient-to-br from-forest-800/60 to-forest-900/40 flex items-center justify-center">
+          <span className="text-4xl opacity-30">{fallbackEmoji}</span>
         </div>
       )}
     </div>

@@ -69,9 +69,9 @@ export default async function TopRestaurantsPage() {
                         {visit.restaurant_name}
                       </h3>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="flex items-center gap-1 text-xs text-white/40"><MapPin className="w-3 h-3" /> {visit.location}</span>
-                        <span className="text-xs text-white/30">{visit.cuisine}</span>
-                        <span className="text-xs text-white/30">{priceRangeLabel[visit.price_range as keyof typeof priceRangeLabel]}</span>
+                        <span className="flex items-center gap-1 text-xs text-white/50"><MapPin className="w-3 h-3" /> {visit.location}</span>
+                        <span className="text-xs text-white/40">{visit.cuisine}</span>
+                        <span className="text-xs text-white/40">{priceRangeLabel[visit.price_range as keyof typeof priceRangeLabel]}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
                         <span className={cn("inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider",

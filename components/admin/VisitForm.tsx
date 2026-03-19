@@ -14,6 +14,8 @@ const RECOMMENDATION_LEVELS = ["must_try", "worth_it", "decent", "skip"];
 const CUISINES = ["Italian", "Japanese", "Indian", "Mexican", "French", "Chinese", "Thai", "Mediterranean", "American", "Korean", "Spanish", "New Nordic", "Middle Eastern", "Vietnamese", "Greek", "Other"];
 
 interface DishEntry {
+  /** If set, this is an existing dish to update; otherwise a new dish to insert */
+  id?: string;
   dish_name: string; price: string; rating: number;
   notes: string; flavor_tags: FlavorTag[]; image: File | null;
 }
@@ -65,6 +67,7 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
   });
   const [dishes, setDishes] = useState<DishEntry[]>(
     initialData?.dishes?.map((d: any) => ({
+      id: d.id,
       dish_name: d.dish_name,
       price: d.price?.toString() || "",
       rating: d.rating,
@@ -73,6 +76,8 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
       image: null,
     })) || []
   );
+  /** IDs of dishes that existed when the form loaded — used to detect removals */
+  const originalDishIds = initialData?.dishes?.map((d: any) => d.id).filter(Boolean) || [];
   const setField = (key: string, value: any) => setForm((f) => ({ ...f, [key]: value }));
   const addDish = () => setDishes([...dishes, { dish_name: "", price: "", rating: 7, notes: "", flavor_tags: [], image: null }]);
   const updateDish = (i: number, key: keyof DishEntry, value: any) => {
@@ -100,6 +105,16 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
         const { data, error } = await supabase.from("restaurant_visits").insert({ ...form, user_id: user.id }).select().single();
         if (error) throw error;
         visitResult = data;
+      }
+
+      // Detect removed dishes: existing IDs no longer in the form
+      const currentIds = dishes.map(d => d.id).filter(Boolean) as string[];
+      const removedIds = originalDishIds.filter((id: string) => !currentIds.includes(id));
+
+      // Delete removed dishes
+      if (removedIds.length > 0) {
+        const { error: delErr } = await supabase.from("dishes").delete().in("id", removedIds);
+        if (delErr) throw delErr;
       }
 
       for (const dish of dishes) {
@@ -149,12 +164,28 @@ export function VisitForm({ initialData, visitId, dark = true }: { initialData?:
             throw upErr;
           }
         }
-        await supabase.from("dishes").insert({
-          visit_id: visitResult.id, dish_name: dish.dish_name,
-          price: dish.price ? parseFloat(dish.price) : null,
-          rating: dish.rating, notes: dish.notes || null,
-          flavor_tags: dish.flavor_tags, image_url,
-        });
+
+        if (dish.id) {
+          // Existing dish — update it
+          const { error: updErr } = await supabase.from("dishes").update({
+            dish_name: dish.dish_name,
+            price: dish.price ? parseFloat(dish.price) : null,
+            rating: dish.rating,
+            notes: dish.notes || null,
+            flavor_tags: dish.flavor_tags,
+            image_url: image_url || undefined,
+          }).eq("id", dish.id);
+          if (updErr) throw updErr;
+        } else {
+          // New dish — insert it
+          const { error: insErr } = await supabase.from("dishes").insert({
+            visit_id: visitResult.id, dish_name: dish.dish_name,
+            price: dish.price ? parseFloat(dish.price) : null,
+            rating: dish.rating, notes: dish.notes || null,
+            flavor_tags: dish.flavor_tags, image_url,
+          });
+          if (insErr) throw insErr;
+        }
       }
 
       router.push(`/restaurants/${visitResult.id}`);

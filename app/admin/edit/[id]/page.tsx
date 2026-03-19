@@ -10,7 +10,7 @@ export default async function EditVisitPage({ params }: { params: { id: string }
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: visit } = await supabase.from("restaurant_visits").select("*").eq("id", params.id).single();
+  const { data: visit } = await supabase.from("restaurant_visits").select("*, dishes(*), photos(*)").eq("id", params.id).single();
   if (!visit) redirect("/admin");
 
   return (

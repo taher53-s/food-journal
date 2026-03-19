@@ -70,7 +70,7 @@ interface SidebarRankItemProps {
 
 export function SidebarRankItem({ emoji, name, rating, index, dark = false }: SidebarRankItemProps) {
   const nameClass = dark ? "text-white/80" : "text-forest-700";
-  const valueClass = dark ? "text-white/50" : "text-forest-600";
+  const valueClass = dark ? "text-white/60" : "text-forest-600";
   return (
     <motion.div
       initial={{ opacity: 0, x: 16 }}

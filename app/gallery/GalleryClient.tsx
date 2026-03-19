@@ -35,7 +35,7 @@ function GalleryPhotoItem({ photo, index, onClick }: { photo: Photo; index: numb
       onClick={onClick}
     >
       {/* Skeleton */}
-      <div className="absolute inset-0 bg-forest-100 animate-pulse" />
+      <div className="absolute inset-0 bg-forest-800/40 animate-pulse" />
 
       {/* Image */}
       <img
