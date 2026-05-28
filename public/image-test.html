@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><title>Image Test</title></head>
+<body style="font-family: sans-serif; padding: 20px;">
+<h1>Image Loading Test</h1>
+<p>If you see images below, Supabase storage is working correctly.</p>
+
+<h2>Image 1 (1441 Pizzeria - Cheese Garlic Bread)</h2>
+<img 
+  src="https://fsgxvxdnpnjcbucukfpn.supabase.co/storage/v1/object/public/food-photos/fdd7447b-192b-4209-b060-7adba05f64a2/1773192839598.jpg" 
+  width="400"
+  onerror="this.alt='FAILED TO LOAD'; this.style.border='3px solid red'; document.getElementById('err1').textContent='❌ ERROR: Image 1 failed to load. Check console for details.'"
+  onload="document.getElementById('err1').textContent='✅ Image 1 loaded successfully!'"
+/>
+<p id="err1">Loading...</p>
+
+<h2>Image 2 (BangTan Shefs - Interior)</h2>
+<img 
+  src="https://fsgxvxdnpnjcbucukfpn.supabase.co/storage/v1/object/public/food-photos/be18f41b-25e5-46a5-9562-4ae1dc26f7c1/1773961680611-interior.jpeg" 
+  width="400"
+  onerror="this.alt='FAILED TO LOAD'; this.style.border='3px solid red'; document.getElementById('err2').textContent='❌ ERROR: Image 2 failed to load.'"
+  onload="document.getElementById('err2').textContent='✅ Image 2 loaded successfully!'"
+/>
+<p id="err2">Loading...</p>
+
+<h2>Image 3 (Chicken Pepperoni Pizza)</h2>
+<img 
+  src="https://fsgxvxdnpnjcbucukfpn.supabase.co/storage/v1/object/public/food-photos/fdd7447b-192b-4209-b060-7adba05f64a2/1773192842686.jpg" 
+  width="400"
+  onerror="this.alt='FAILED TO LOAD'; this.style.border='3px solid red'; document.getElementById('err3').textContent='❌ ERROR: Image 3 failed to load.'"
+  onload="document.getElementById('err3').textContent='✅ Image 3 loaded successfully!'"
+/>
+<p id="err3">Loading...</p>
+
+<script>
+console.log('Image test page loaded. Check Network tab for image request status codes.');
+</script>
+</body>
+</html>
